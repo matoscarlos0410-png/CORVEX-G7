@@ -1,0 +1,1280 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#050a14">
+
+  <title>SCORVEX G7</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- =========================
+       PANTALLA DE CARGA
+  ========================== -->
+
+  <div id="boot" class="boot">
+
+    <div class="logo">
+
+      <svg viewBox="0 0 700 700">
+
+        <defs>
+
+          <radialGradient id="b">
+            <stop stop-color="#168cff"/>
+            <stop offset=".55" stop-color="#073b91"/>
+            <stop offset="1" stop-color="#020712"/>
+          </radialGradient>
+
+          <linearGradient id="o">
+            <stop stop-color="#fff"/>
+            <stop offset=".35" stop-color="#ffb000"/>
+            <stop offset="1" stop-color="#ff3d00"/>
+          </linearGradient>
+
+          <linearGradient id="m">
+            <stop stop-color="#fff"/>
+            <stop offset=".6" stop-color="#bcd5f0"/>
+            <stop offset="1" stop-color="#60758d"/>
+          </linearGradient>
+
+          <linearGradient id="g">
+            <stop stop-color="#fff"/>
+            <stop offset=".35" stop-color="#00b7ff"/>
+            <stop offset="1" stop-color="#075cff"/>
+          </linearGradient>
+
+        </defs>
+
+
+        <rect
+          width="700"
+          height="700"
+          fill="#000"
+        />
+
+
+        <circle
+          cx="350"
+          cy="350"
+          r="315"
+          fill="url(#b)"
+        />
+
+
+        <path
+          d="
+            M350 35
+            A315 315 0 0 1 350 665
+            L350 35
+            Z
+          "
+          fill="url(#o)"
+        />
+
+
+        <circle
+          cx="350"
+          cy="350"
+          r="320"
+          fill="none"
+          stroke="#00baff"
+          stroke-width="8"
+        />
+
+
+        <path
+          d="
+            M350 30
+            A320 320 0 0 1 350 670
+          "
+          fill="none"
+          stroke="#ff4d00"
+          stroke-width="9"
+        />
+
+
+        <!-- CIUDAD -->
+
+        <g
+          fill="#03070d"
+          opacity=".7"
+        >
+
+          <path
+            d="
+              M20 530
+              l50-30
+              v-60
+              h35
+              v-60
+              h30
+              v90
+              h40
+              v-60
+              h35
+              v120
+              z
+            "
+          />
+
+          <path
+            d="
+              M500 550
+              V450
+              h30
+              v-70
+              h30
+              v50
+              h30
+              v-80
+              h35
+              v150
+              h55
+              v50
+              z
+            "
+          />
+
+        </g>
+
+
+        <!-- ARMAS DECORATIVAS -->
+
+        <g
+          fill="none"
+          stroke="#02060b"
+          stroke-width="20"
+        >
+
+          <path d="M80 170l135 105"/>
+
+          <path d="M620 170L485 275"/>
+
+        </g>
+
+
+        <!-- CASCO -->
+
+        <path
+          d="
+            M235 190
+            Q245 110 350 92
+            Q455 110 465 190
+            l-15 70
+            H250
+            z
+          "
+          fill="#111820"
+          stroke="#506579"
+          stroke-width="8"
+        />
+
+
+        <!-- VISOR -->
+
+        <path
+          d="
+            M245 190
+            q105-35 210 0
+            l-20 80
+            q-85 25-170 0
+            z
+          "
+          fill="#06101b"
+          stroke="#213b55"
+          stroke-width="8"
+        />
+
+
+        <!-- VISOR AZUL -->
+
+        <path
+          d="
+            M260 200
+            q45-20 90-20
+            v95
+            q-50-5-80-25
+            z
+          "
+          fill="#008dff"
+        />
+
+
+        <!-- VISOR NARANJA -->
+
+        <path
+          d="
+            M350 180
+            q45 0 90 20
+            l-10 50
+            q-30 20-80 25
+            z
+          "
+          fill="#ff5a00"
+        />
+
+
+        <!-- CUELLO -->
+
+        <path
+          d="
+            M270 265
+            h160
+            l40 65
+            H230
+            z
+          "
+          fill="#0d151d"
+          stroke="#3b5064"
+          stroke-width="7"
+        />
+
+
+        <!-- SCORVEX -->
+
+        <text
+          x="350"
+          y="405"
+          text-anchor="middle"
+          font-family="Impact,Arial Black"
+          font-size="105"
+          fill="url(#m)"
+          stroke="#05080d"
+          stroke-width="12"
+          paint-order="stroke"
+        >
+          SCORVEX
+        </text>
+
+
+        <!-- X -->
+
+        <text
+          x="535"
+          y="405"
+          text-anchor="middle"
+          font-family="Impact,Arial Black"
+          font-size="112"
+          fill="url(#o)"
+        >
+          X
+        </text>
+
+
+        <!-- G -->
+
+        <text
+          x="310"
+          y="535"
+          text-anchor="middle"
+          font-family="Impact,Arial Black"
+          font-size="145"
+          fill="url(#g)"
+          stroke="#001a52"
+          stroke-width="12"
+          paint-order="stroke"
+        >
+          G
+        </text>
+
+
+        <!-- 7 -->
+
+        <text
+          x="430"
+          y="535"
+          text-anchor="middle"
+          font-family="Impact,Arial Black"
+          font-size="145"
+          fill="url(#o)"
+          stroke="#8a2600"
+          stroke-width="12"
+          paint-order="stroke"
+        >
+          7
+        </text>
+
+      </svg>
+
+    </div>
+
+
+    <div class="load">
+      <i id="progress"></i>
+    </div>
+
+    <p id="bootText">
+      Cargando SCORVEX...
+    </p>
+
+  </div>
+
+
+  <!-- =========================
+       APLICACIÓN
+  ========================== -->
+
+  <main id="app" class="hidden">
+
+
+    <!-- =========================
+         MENÚ
+    ========================== -->
+
+    <section
+      id="menu"
+      class="screen"
+    >
+
+      <header>
+
+        <div class="brand">
+
+          <b>
+            S
+          </b>
+
+          <span>
+
+            <strong>
+              SCORVEX
+            </strong>
+
+            <small>
+              G7 BATTLE ARENA
+            </small>
+
+          </span>
+
+        </div>
+
+
+        <div class="res">
+
+          ◈
+          <b id="coins">
+            0
+          </b>
+
+          &nbsp;&nbsp;
+
+          ◆
+          <b id="crystals">
+            0
+          </b>
+
+          &nbsp;&nbsp;
+
+          NIV
+          <b id="level">
+            1
+          </b>
+
+        </div>
+
+      </header>
+
+
+      <!-- HERO -->
+
+      <div class="hero">
+
+        <div>
+
+          <label>
+            TEMPORADA G7
+          </label>
+
+
+          <h1>
+            DOMINA LA
+            <em>
+              ARENA
+            </em>
+          </h1>
+
+
+          <p>
+            Combate, consigue armas,
+            usa habilidades y personaliza
+            tu personaje.
+          </p>
+
+
+          <button
+            id="play"
+            class="primary"
+          >
+            ▶ JUGAR
+          </button>
+
+        </div>
+
+
+        <!-- PERSONAJE -->
+
+        <div class="heroChar">
+
+          <i></i>
+
+          <b></b>
+
+          <span></span>
+
+        </div>
+
+      </div>
+
+
+      <!-- MENÚ PRINCIPAL -->
+
+      <nav>
+
+        <button data-open="shop">
+
+          🔫
+
+          <strong>
+            TIENDA
+          </strong>
+
+          <small>
+            1000 ARMAS
+          </small>
+
+        </button>
+
+
+        <button data-open="inventory">
+
+          🎒
+
+          <strong>
+            INVENTARIO
+          </strong>
+
+          <small>
+            EQUIPAMIENTO
+          </small>
+
+        </button>
+
+
+        <button data-open="character">
+
+          👤
+
+          <strong>
+            PERSONAJE
+          </strong>
+
+          <small>
+            PERSONALIZAR
+          </small>
+
+        </button>
+
+
+        <button data-open="music">
+
+          🎵
+
+          <strong>
+            MÚSICA
+          </strong>
+
+          <small>
+            4 TEMAS
+          </small>
+
+        </button>
+
+
+        <button data-open="missions">
+
+          🎯
+
+          <strong>
+            MISIONES
+          </strong>
+
+          <small>
+            RECOMPENSAS
+          </small>
+
+        </button>
+
+
+        <button data-open="map">
+
+          🗺️
+
+          <strong>
+            MAPA
+          </strong>
+
+          <small>
+            SECTORES
+          </small>
+
+        </button>
+
+      </nav>
+
+
+      <footer>
+
+        ARMAS
+        <b>
+          1000
+        </b>
+
+        &nbsp;
+
+        HABILIDADES
+        <b>
+          90
+        </b>
+
+        &nbsp;
+
+        ARMADURAS
+        <b>
+          6
+        </b>
+
+        &nbsp;
+
+        G7
+
+      </footer>
+
+    </section>
+
+
+    <!-- =========================
+         TIENDA
+    ========================== -->
+
+    <section
+      id="shop"
+      class="screen panel hidden"
+    >
+
+      <header>
+
+        <button
+          class="back"
+          data-back="menu"
+        >
+          ←
+        </button>
+
+
+        <div>
+
+          <h2>
+            TIENDA DE ARMAS
+          </h2>
+
+          <small>
+            1000 armas · monedas virtuales
+          </small>
+
+        </div>
+
+      </header>
+
+
+      <div class="filters">
+
+        <input
+          id="search"
+          placeholder="Buscar arma..."
+        >
+
+
+        <select id="rarity">
+
+          <option value="all">
+            Todas las rarezas
+          </option>
+
+          <option value="common">
+            Común
+          </option>
+
+          <option value="uncommon">
+            Poco común
+          </option>
+
+          <option value="rare">
+            Raro
+          </option>
+
+          <option value="epic">
+            Épico
+          </option>
+
+          <option value="legendary">
+            Legendario
+          </option>
+
+          <option value="mythic">
+            Mítico
+          </option>
+
+          <option value="ancient">
+            Antiguo
+          </option>
+
+          <option value="omega">
+            Omega
+          </option>
+
+        </select>
+
+
+        <select id="type">
+
+          <option value="all">
+            Todos los tipos
+          </option>
+
+          <option value="rifle">
+            Rifle
+          </option>
+
+          <option value="smg">
+            SMG
+          </option>
+
+          <option value="shotgun">
+            Escopeta
+          </option>
+
+          <option value="sniper">
+            Francotirador
+          </option>
+
+          <option value="pistol">
+            Pistola
+          </option>
+
+          <option value="laser">
+            Láser
+          </option>
+
+          <option value="plasma">
+            Plasma
+          </option>
+
+          <option value="energy">
+            Energía
+          </option>
+
+          <option value="arc">
+            Arco
+          </option>
+
+          <option value="vortex">
+            Vórtice
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <p class="count">
+
+        Mostrando
+
+        <b id="count">
+          0
+        </b>
+
+      </p>
+
+
+      <div
+        id="shopGrid"
+        class="grid"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         INVENTARIO
+    ========================== -->
+
+    <section
+      id="inventory"
+      class="screen panel hidden"
+    >
+
+      <header>
+
+        <button
+          class="back"
+          data-back="menu"
+        >
+          ←
+        </button>
+
+        <h2>
+          INVENTARIO
+        </h2>
+
+      </header>
+
+
+      <div class="tabs">
+
+        <button data-tab="weapons">
+          🔫 ARMAS
+        </button>
+
+        <button data-tab="abilities">
+          ⚡ HABILIDADES
+        </button>
+
+        <button data-tab="armor">
+          🛡️ ARMADURA
+        </button>
+
+        <button data-tab="items">
+          🎒 OBJETOS
+        </button>
+
+      </div>
+
+
+      <div
+        id="inventoryGrid"
+        class="grid"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         PERSONAJE
+    ========================== -->
+
+    <section
+      id="character"
+      class="screen panel hidden"
+    >
+
+      <header>
+
+        <button
+          class="back"
+          data-back="menu"
+        >
+          ←
+        </button>
+
+        <h2>
+          PERSONALIZAR PERSONAJE
+        </h2>
+
+      </header>
+
+
+      <div class="custom">
+
+
+        <div class="charPreview">
+
+          <div class="head"></div>
+
+          <div class="body"></div>
+
+          <div class="arms"></div>
+
+          <div class="legs"></div>
+
+
+          <button id="random">
+
+            🎲 ALEATORIO
+
+          </button>
+
+        </div>
+
+
+        <div>
+
+          <div class="tabs">
+
+            <button data-custom="outfit">
+              ROPA
+            </button>
+
+            <button data-custom="head">
+              CABEZA
+            </button>
+
+            <button data-custom="accessories">
+              ACCESORIOS
+            </button>
+
+            <button data-custom="effects">
+              EFECTOS
+            </button>
+
+            <button data-custom="colors">
+              COLORES
+            </button>
+
+          </div>
+
+
+          <div
+            id="customGrid"
+            class="grid"
+          ></div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         MÚSICA
+    ========================== -->
+
+    <section
+      id="music"
+      class="screen panel hidden"
+    >
+
+      <header>
+
+        <button
+          class="back"
+          data-back="menu"
+        >
+          ←
+        </button>
+
+        <h2>
+          4 TIPOS DE MÚSICA
+        </h2>
+
+      </header>
+
+
+      <div
+        id="musicList"
+        class="music"
+      ></div>
+
+
+      <button
+        id="musicToggle"
+        class="primary"
+      >
+        🔇 MÚSICA
+      </button>
+
+
+      <label class="volume">
+
+        Volumen
+
+        <input
+          id="volume"
+          type="range"
+          min="0"
+          max="100"
+          value="45"
+        >
+
+      </label>
+
+    </section>
+
+
+    <!-- =========================
+         MISIONES
+    ========================== -->
+
+    <section
+      id="missions"
+      class="screen panel hidden"
+    >
+
+      <header>
+
+        <button
+          class="back"
+          data-back="menu"
+        >
+          ←
+        </button>
+
+        <h2>
+          MISIONES
+        </h2>
+
+      </header>
+
+
+      <div
+        id="missionsList"
+        class="missions"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         MAPA
+    ========================== -->
+
+    <section
+      id="map"
+      class="screen panel hidden"
+    >
+
+      <header>
+
+        <button
+          class="back"
+          data-back="menu"
+        >
+          ←
+        </button>
+
+        <h2>
+          MAPA
+        </h2>
+
+      </header>
+
+
+      <div class="map">
+
+        <button>
+
+          SECTOR 01
+
+          <small>
+            Zona inicial
+          </small>
+
+        </button>
+
+
+        <button>
+
+          SECTOR 02
+
+          <small>
+            Ruinas urbanas
+          </small>
+
+        </button>
+
+
+        <button>
+
+          SECTOR 03
+
+          <small>
+            Zona industrial
+          </small>
+
+        </button>
+
+
+        <button>
+
+          SECTOR 04
+
+          <small>
+            Base avanzada
+          </small>
+
+        </button>
+
+
+        <button disabled>
+
+          SECTOR 05
+
+          <small>
+            🔒 Nivel 10
+          </small>
+
+        </button>
+
+
+        <button disabled>
+
+          SECTOR 06
+
+          <small>
+            🔒 Nivel 15
+          </small>
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         JUEGO
+    ========================== -->
+
+    <section
+      id="game"
+      class="screen hidden"
+    >
+
+
+      <!-- HUD -->
+
+      <div class="hud">
+
+
+        <div>
+
+          HP
+
+          <b id="hp">
+            100
+          </b>
+
+          <div class="bar">
+            <i id="hpbar"></i>
+          </div>
+
+        </div>
+
+
+        <div>
+
+          ENERGÍA
+
+          <b id="energy">
+            100
+          </b>
+
+          <div class="bar">
+            <i id="energybar"></i>
+          </div>
+
+        </div>
+
+
+        <div>
+
+          OLEADA
+
+          <b id="wave">
+            1
+          </b>
+
+        </div>
+
+
+        <div>
+
+          PUNTOS
+
+          <b id="score">
+            0
+          </b>
+
+        </div>
+
+
+        <button id="pause">
+
+          Ⅱ
+
+        </button>
+
+      </div>
+
+
+      <!-- CANVAS -->
+
+      <canvas
+        id="canvas"
+        width="1100"
+        height="650"
+      ></canvas>
+
+
+      <!-- ARMA -->
+
+      <div class="weaponHud">
+
+        <span id="weaponIcon">
+          🔫
+        </span>
+
+
+        <b id="weaponName">
+
+          SCORVEX
+
+        </b>
+
+
+        <strong>
+
+          <span id="ammo">
+            30
+          </span>
+
+          /
+
+          <small id="reserve">
+            120
+          </small>
+
+        </strong>
+
+      </div>
+
+
+      <!-- CONTROLES MÓVILES -->
+
+      <div class="touch">
+
+
+        <div class="dpad">
+
+          <button data-key="w">
+            ▲
+          </button>
+
+          <button data-key="a">
+            ◀
+          </button>
+
+          <button data-key="s">
+            ▼
+          </button>
+
+          <button data-key="d">
+            ▶
+          </button>
+
+        </div>
+
+
+        <div>
+
+          <button id="ability">
+            ⚡
+          </button>
+
+          <button id="medkit">
+            🩹
+          </button>
+
+          <button id="reload">
+            🔄
+          </button>
+
+          <button id="fire">
+            🔥
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- BOTONES INFERIORES -->
+
+      <div class="gamebar">
+
+        <button id="gameInventory">
+          🎒
+        </button>
+
+        <button id="gameMusic">
+          🎵
+        </button>
+
+        <button id="exit">
+          🚪
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       PAUSA
+  ========================== -->
+
+  <div
+    id="pauseModal"
+    class="modal hidden"
+  >
+
+    <div>
+
+      <h2>
+        JUEGO PAUSADO
+      </h2>
+
+
+      <button
+        id="resume"
+        class="primary"
+      >
+
+        CONTINUAR
+
+      </button>
+
+
+      <button id="quit">
+
+        SALIR
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div id="notes"></div>
+
+
+  <!-- IMPORTANTE:
+       weapons-g7.js debe cargarse
+       antes que game.js
+  -->
+
+  <script src="weapons-g7.js"></script>
+
+  <script src="game.js"></script>
+
+</body>
+</html>
