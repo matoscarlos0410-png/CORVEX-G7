@@ -1,0 +1,1662 @@
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  margin:0;
+  min-height:100%;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#050a14;
+  color:#eef5ff;
+}
+
+body{
+  overflow-x:hidden;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+  color:inherit;
+  border:0;
+}
+
+:root{
+  --blue:#00aaff;
+  --orange:#ff5b00;
+  --panel:#0c1726;
+  --muted:#91a3bb;
+  --green:#35db83;
+  --red:#ff465c;
+}
+
+.hidden{
+  display:none!important;
+}
+
+
+/* =========================
+   PANTALLA DE CARGA
+========================= */
+
+.boot{
+  position:fixed;
+  inset:0;
+  background:#01040a;
+  display:grid;
+  place-items:center;
+  z-index:99;
+}
+
+.logo{
+  width:min(430px,85vw);
+}
+
+.logo svg{
+  width:100%;
+  display:block;
+}
+
+.load{
+  width:min(420px,80vw);
+  height:8px;
+  background:#172337;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:15px;
+}
+
+.load i{
+  display:block;
+  height:100%;
+  width:0;
+  background:linear-gradient(
+    90deg,
+    var(--blue),
+    var(--orange)
+  );
+}
+
+.boot p{
+  text-align:center;
+  color:var(--muted);
+}
+
+
+/* =========================
+   GENERAL
+========================= */
+
+.screen{
+  min-height:100vh;
+}
+
+.panel{
+  background:
+    radial-gradient(
+      circle at 80% 5%,
+      #007fff16,
+      transparent 35%
+    ),
+    #050a14;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header{
+  height:70px;
+  padding:12px 24px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+
+  border-bottom:1px solid #ffffff16;
+
+  background:#020710d9;
+
+  backdrop-filter:blur(10px);
+}
+
+header .brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.brand>b{
+  display:grid;
+  place-items:center;
+
+  width:42px;
+  height:42px;
+
+  border:2px solid var(--blue);
+
+  font-size:24px;
+
+  box-shadow:
+    0 0 15px #00aaff44;
+}
+
+.brand strong{
+  display:block;
+  font-size:16px;
+  letter-spacing:1px;
+}
+
+.brand small{
+  display:block;
+  color:var(--muted);
+  font-size:9px;
+  letter-spacing:2px;
+}
+
+.res{
+  margin-left:auto;
+  font-size:12px;
+}
+
+.res b{
+  color:#fff;
+}
+
+
+/* =========================
+   BOTONES
+========================= */
+
+.primary{
+  background:
+    linear-gradient(
+      90deg,
+      #146cff,
+      var(--blue)
+    );
+
+  padding:14px 26px;
+
+  border-radius:8px;
+
+  font-weight:900;
+
+  box-shadow:
+    0 8px 25px #009dff2a;
+
+  transition:
+    transform .2s,
+    box-shadow .2s;
+}
+
+.primary:hover{
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 12px 30px #009dff55;
+}
+
+.back{
+  width:42px;
+  height:42px;
+
+  background:#132238;
+
+  border-radius:7px;
+
+  font-size:24px;
+}
+
+.back:hover{
+  background:#1c3552;
+}
+
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+  max-width:1100px;
+  margin:auto;
+
+  min-height:430px;
+
+  padding:55px 35px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.hero>div:first-child{
+  max-width:600px;
+}
+
+.hero label{
+  display:inline-block;
+
+  border:1px solid var(--blue);
+
+  padding:7px 12px;
+
+  font-size:10px;
+
+  color:#71d7ff;
+
+  letter-spacing:2px;
+}
+
+.hero h1{
+  font-size:
+    clamp(42px,7vw,82px);
+
+  line-height:.9;
+
+  margin:18px 0;
+}
+
+.hero em{
+  color:var(--orange);
+  font-style:normal;
+
+  text-shadow:
+    0 0 25px #ff5b0055;
+}
+
+.hero p{
+  color:#9eb0c5;
+  line-height:1.6;
+  max-width:520px;
+}
+
+
+/* =========================
+   PERSONAJE DEL MENÚ
+========================= */
+
+.heroChar{
+  width:240px;
+  height:310px;
+
+  position:relative;
+
+  filter:
+    drop-shadow(
+      0 0 30px #008cff33
+    );
+}
+
+.heroChar i{
+  position:absolute;
+
+  width:95px;
+  height:95px;
+
+  left:72px;
+  top:20px;
+
+  border-radius:45%;
+
+  background:#172534;
+
+  border:3px solid #506579;
+
+  box-shadow:
+    0 0 20px #00aaff22;
+}
+
+.heroChar i:after{
+  content:"";
+
+  position:absolute;
+
+  left:10px;
+  right:10px;
+  top:38px;
+
+  height:22px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #008dff,
+      #ff5a00
+    );
+}
+
+.heroChar b{
+  position:absolute;
+
+  left:45px;
+  top:110px;
+
+  width:150px;
+  height:145px;
+
+  background:#17283b;
+
+  border:3px solid #4b6378;
+
+  border-radius:25px;
+}
+
+.heroChar span{
+  position:absolute;
+
+  right:-20px;
+  top:145px;
+
+  width:130px;
+  height:13px;
+
+  background:#080d13;
+
+  border:3px solid #60758a;
+
+  transform:rotate(-25deg);
+}
+
+
+/* =========================
+   MENU PRINCIPAL
+========================= */
+
+nav{
+  max-width:1100px;
+
+  margin:auto;
+
+  padding:
+    10px 25px 30px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(6,1fr);
+
+  gap:10px;
+}
+
+nav button{
+  min-height:105px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #122138,
+      #080f1c
+    );
+
+  border:1px solid #ffffff12;
+
+  border-radius:9px;
+
+  transition:
+    transform .2s,
+    border-color .2s,
+    box-shadow .2s;
+}
+
+nav button:hover{
+  border-color:var(--blue);
+
+  transform:
+    translateY(-3px);
+
+  box-shadow:
+    0 8px 25px #008cff22;
+}
+
+nav button:first-letter{
+  font-size:25px;
+}
+
+nav strong,
+nav small{
+  display:block;
+}
+
+nav strong{
+  font-size:11px;
+  margin-top:5px;
+}
+
+nav small{
+  font-size:8px;
+  color:var(--muted);
+  margin-top:5px;
+}
+
+footer{
+  text-align:center;
+
+  color:#71859d;
+
+  padding:15px;
+
+  font-size:10px;
+}
+
+footer b{
+  color:#d9e8f8;
+}
+
+
+/* =========================
+   TIENDA
+========================= */
+
+.filters{
+  max-width:1250px;
+
+  margin:
+    20px auto 8px;
+
+  padding:
+    0 18px;
+
+  display:grid;
+
+  grid-template-columns:
+    2fr 1fr 1fr;
+
+  gap:10px;
+}
+
+.filters input,
+.filters select{
+  background:#0c1726;
+
+  border:1px solid #ffffff18;
+
+  color:#fff;
+
+  padding:12px;
+
+  border-radius:7px;
+
+  outline:none;
+}
+
+.filters input:focus,
+.filters select:focus{
+  border-color:var(--blue);
+
+  box-shadow:
+    0 0 10px #00aaff22;
+}
+
+.filters select option{
+  background:#0c1726;
+}
+
+.count{
+  max-width:1250px;
+
+  margin:0 auto;
+
+  padding:0 18px;
+
+  color:var(--muted);
+
+  font-size:12px;
+}
+
+
+/* =========================
+   GRID
+========================= */
+
+.grid{
+  max-width:1250px;
+
+  margin:auto;
+
+  padding:
+    10px 18px 35px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap:11px;
+}
+
+
+/* =========================
+   TARJETAS
+========================= */
+
+.card{
+  background:#0d1929;
+
+  border:1px solid #ffffff12;
+
+  border-radius:10px;
+
+  padding:12px;
+
+  transition:
+    transform .2s,
+    border-color .2s,
+    box-shadow .2s;
+}
+
+.card:hover{
+  border-color:#3284b8;
+
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 8px 25px #0005;
+}
+
+.card h3{
+  font-size:13px;
+
+  margin:
+    9px 0 3px;
+}
+
+.card small{
+  color:var(--muted);
+}
+
+
+/* =========================
+   ICONOS DE ARMAS
+========================= */
+
+.icon{
+  height:65px;
+
+  display:grid;
+
+  place-items:center;
+
+  background:#07111d;
+
+  border-radius:7px;
+
+  overflow:hidden;
+}
+
+.icon svg{
+  width:65px;
+  height:65px;
+
+  filter:
+    drop-shadow(
+      0 0 8px currentColor
+    );
+}
+
+
+/* =========================
+   ESTADÍSTICAS
+========================= */
+
+.stats{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:4px;
+
+  margin:9px 0;
+}
+
+.stats div{
+  background:#091422;
+
+  padding:5px;
+
+  text-align:center;
+
+  border-radius:4px;
+}
+
+.stats small{
+  display:block;
+
+  font-size:7px;
+}
+
+.stats b{
+  font-size:10px;
+}
+
+
+/* =========================
+   BOTONES DE COMPRA
+========================= */
+
+.bottom{
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:8px;
+}
+
+.price{
+  color:#ffd23e;
+
+  font-size:11px;
+
+  font-weight:bold;
+}
+
+.buy,
+.equip{
+  background:#183450;
+
+  padding:8px 10px;
+
+  border-radius:6px;
+
+  font-size:9px;
+
+  font-weight:bold;
+
+  transition:
+    background .2s,
+    transform .2s;
+}
+
+.buy:hover,
+.equip:hover{
+  background:#245477;
+
+  transform:translateY(-1px);
+}
+
+.buy.owned{
+  background:#1a4932;
+}
+
+
+/* =========================
+   RAREZAS
+========================= */
+
+.rarity-common{
+  color:#c7ced6!important;
+}
+
+.rarity-uncommon{
+  color:#49dc85!important;
+}
+
+.rarity-rare{
+  color:#39a8ff!important;
+}
+
+.rarity-epic{
+  color:#a66cff!important;
+}
+
+.rarity-legendary{
+  color:#ffad24!important;
+}
+
+.rarity-mythic{
+  color:#ff4d8d!important;
+}
+
+.rarity-ancient{
+  color:#ff6237!important;
+}
+
+.rarity-omega{
+  color:#fff36b!important;
+}
+
+
+/* =========================
+   PESTAÑAS
+========================= */
+
+.tabs{
+  max-width:1250px;
+
+  margin:
+    18px auto 5px;
+
+  padding:
+    0 18px;
+
+  display:flex;
+
+  gap:7px;
+
+  flex-wrap:wrap;
+}
+
+.tabs button{
+  background:#111f32;
+
+  border:1px solid #ffffff12;
+
+  padding:10px;
+
+  border-radius:6px;
+
+  font-size:10px;
+
+  transition:
+    border-color .2s,
+    background .2s;
+}
+
+.tabs button:hover{
+  border-color:var(--blue);
+
+  background:#142a42;
+}
+
+
+/* =========================
+   PERSONALIZACIÓN
+========================= */
+
+.custom{
+  max-width:1000px;
+
+  margin:25px auto;
+
+  display:grid;
+
+  grid-template-columns:
+    280px 1fr;
+
+  gap:20px;
+
+  padding:
+    0 18px;
+}
+
+.charPreview{
+  height:370px;
+
+  background:#0b1422;
+
+  border:1px solid #ffffff15;
+
+  border-radius:12px;
+
+  position:relative;
+
+  overflow:hidden;
+
+  box-shadow:
+    inset 0 0 50px #0005;
+}
+
+.charPreview .head{
+  position:absolute;
+
+  top:35px;
+  left:92px;
+
+  width:95px;
+  height:90px;
+
+  border-radius:45%;
+
+  background:#263b4f;
+
+  border:3px solid #60758a;
+}
+
+.charPreview .head:after{
+  content:"";
+
+  position:absolute;
+
+  left:10px;
+  right:10px;
+
+  top:35px;
+
+  height:22px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--blue),
+      var(--orange)
+    );
+}
+
+.charPreview .body{
+  position:absolute;
+
+  top:130px;
+  left:62px;
+
+  width:155px;
+  height:140px;
+
+  border-radius:25px;
+
+  background:#182a3d;
+
+  border:3px solid #4d6479;
+}
+
+.charPreview .arms{
+  position:absolute;
+
+  top:140px;
+  left:38px;
+
+  width:205px;
+  height:125px;
+
+  border-left:
+    35px solid #152436;
+
+  border-right:
+    35px solid #152436;
+}
+
+.charPreview .legs{
+  position:absolute;
+
+  top:260px;
+  left:82px;
+
+  width:120px;
+  height:90px;
+
+  border-left:
+    45px solid #111c2a;
+
+  border-right:
+    45px solid #111c2a;
+}
+
+.charPreview button{
+  position:absolute;
+
+  bottom:12px;
+
+  left:20px;
+  right:20px;
+
+  padding:10px;
+
+  background:#17304c;
+
+  border-radius:7px;
+}
+
+.charPreview button:hover{
+  background:#21486c;
+}
+
+
+/* =========================
+   MÚSICA
+========================= */
+
+.music{
+  max-width:800px;
+
+  margin:25px auto;
+
+  display:grid;
+
+  gap:10px;
+
+  padding:
+    0 18px;
+}
+
+.music button{
+  background:#0e1929;
+
+  border:1px solid #ffffff12;
+
+  border-radius:9px;
+
+  padding:18px;
+
+  text-align:left;
+
+  transition:
+    border-color .2s,
+    transform .2s;
+}
+
+.music button:hover{
+  border-color:var(--blue);
+
+  transform:
+    translateX(3px);
+}
+
+.music small{
+  display:block;
+
+  color:var(--muted);
+
+  margin-top:5px;
+}
+
+.music button b{
+  font-size:13px;
+}
+
+.volume{
+  display:block;
+
+  max-width:800px;
+
+  margin:15px auto;
+
+  padding:
+    0 18px;
+
+  color:var(--muted);
+}
+
+.volume input{
+  width:100%;
+
+  accent-color:
+    var(--blue);
+}
+
+
+/* =========================
+   MISIONES
+========================= */
+
+.missions{
+  max-width:800px;
+
+  margin:25px auto;
+
+  padding:
+    0 18px;
+
+  display:grid;
+
+  gap:10px;
+}
+
+.mission{
+  background:#0e1929;
+
+  border:1px solid #ffffff12;
+
+  border-radius:9px;
+
+  padding:15px;
+}
+
+.mission h3{
+  margin:0;
+}
+
+.mission p,
+.mission small{
+  color:var(--muted);
+}
+
+
+/* =========================
+   MAPA
+========================= */
+
+.map{
+  max-width:900px;
+
+  margin:30px auto;
+
+  padding:
+    0 18px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:12px;
+}
+
+.map button{
+  height:150px;
+
+  text-align:left;
+
+  padding:18px;
+
+  background:#102039;
+
+  border:1px solid #ffffff14;
+
+  border-radius:10px;
+
+  font-weight:bold;
+
+  transition:
+    transform .2s,
+    border-color .2s;
+}
+
+.map button:hover:not(:disabled){
+  border-color:var(--blue);
+
+  transform:
+    translateY(-3px);
+}
+
+.map small{
+  display:block;
+
+  color:var(--muted);
+
+  margin-top:7px;
+}
+
+.map button:disabled{
+  opacity:.45;
+
+  cursor:not-allowed;
+}
+
+
+/* =========================
+   JUEGO
+========================= */
+
+#game{
+  position:fixed;
+
+  inset:0;
+
+  background:#02050a;
+
+  overflow:hidden;
+}
+
+#game canvas{
+  width:100%;
+  height:100%;
+
+  display:block;
+
+  background:#08111b;
+
+  cursor:crosshair;
+}
+
+
+/* =========================
+   HUD
+========================= */
+
+.hud{
+  position:absolute;
+
+  z-index:4;
+
+  top:0;
+  left:0;
+  right:0;
+
+  padding:9px 13px;
+
+  display:flex;
+
+  gap:18px;
+
+  align-items:center;
+
+  background:
+    linear-gradient(
+      #02060edb,
+      transparent
+    );
+
+  pointer-events:none;
+}
+
+.hud>div{
+  min-width:100px;
+
+  font-size:9px;
+}
+
+.hud b{
+  font-size:13px;
+}
+
+.hud .bar{
+  height:6px;
+
+  background:#172437;
+
+  margin-top:3px;
+
+  border-radius:10px;
+
+  overflow:hidden;
+}
+
+.hud .bar i{
+  display:block;
+
+  height:100%;
+
+  width:100%;
+
+  background:var(--green);
+
+  transition:width .15s;
+}
+
+.hud>div:nth-child(2)
+.bar i{
+  background:#23aaff;
+}
+
+.hud>button{
+  margin-left:auto;
+
+  background:#142238;
+
+  padding:8px;
+
+  border-radius:6px;
+
+  pointer-events:auto;
+}
+
+.hud>button:hover{
+  background:#204064;
+}
+
+
+/* =========================
+   ARMA ACTUAL
+========================= */
+
+.weaponHud{
+  position:absolute;
+
+  right:15px;
+  bottom:45px;
+
+  background:#040b14d9;
+
+  border:1px solid #ffffff18;
+
+  border-radius:8px;
+
+  padding:10px;
+
+  display:flex;
+
+  gap:18px;
+
+  align-items:center;
+
+  backdrop-filter:blur(5px);
+}
+
+.weaponHud>span{
+  width:40px;
+  height:40px;
+
+  display:grid;
+  place-items:center;
+
+  font-size:30px;
+}
+
+.weaponHud>span svg{
+  width:40px;
+  height:40px;
+}
+
+.weaponHud b{
+  max-width:230px;
+
+  font-size:12px;
+}
+
+.weaponHud strong{
+  font-size:25px;
+}
+
+.weaponHud small{
+  color:var(--muted);
+}
+
+
+/* =========================
+   CONTROLES TÁCTILES
+========================= */
+
+.touch{
+  display:none;
+
+  position:absolute;
+
+  bottom:55px;
+
+  left:15px;
+  right:15px;
+
+  justify-content:space-between;
+
+  pointer-events:none;
+}
+
+.touch button{
+  width:50px;
+  height:50px;
+
+  border-radius:50%;
+
+  background:#122238cc;
+
+  border:1px solid #ffffff18;
+
+  margin:2px;
+
+  pointer-events:auto;
+}
+
+.touch button:active{
+  background:#24517a;
+
+  transform:scale(.95);
+}
+
+.touch .dpad{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,50px);
+}
+
+.touch .dpad button:nth-child(1){
+  grid-column:2;
+}
+
+.touch .dpad button:nth-child(2){
+  grid-column:1;
+  grid-row:2;
+}
+
+.touch .dpad button:nth-child(3){
+  grid-column:2;
+  grid-row:2;
+}
+
+.touch .dpad button:nth-child(4){
+  grid-column:3;
+  grid-row:2;
+}
+
+
+/* =========================
+   BARRA DEL JUEGO
+========================= */
+
+.gamebar{
+  position:absolute;
+
+  bottom:5px;
+  left:50%;
+
+  transform:
+    translateX(-50%);
+
+  display:flex;
+
+  gap:5px;
+}
+
+.gamebar button{
+  background:#0c1828dd;
+
+  padding:8px;
+
+  border-radius:5px;
+}
+
+.gamebar button:hover{
+  background:#1c3856;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+  position:fixed;
+
+  inset:0;
+
+  z-index:20;
+
+  background:#000b;
+
+  display:grid;
+
+  place-items:center;
+
+  backdrop-filter:blur(4px);
+}
+
+.modal>div{
+  background:#0c1726;
+
+  border:1px solid #2c4763;
+
+  border-radius:12px;
+
+  padding:30px;
+
+  text-align:center;
+
+  min-width:280px;
+
+  box-shadow:
+    0 20px 70px #000b;
+}
+
+.modal button{
+  margin:5px;
+
+  padding:10px 18px;
+
+  border-radius:6px;
+
+  background:#19324c;
+}
+
+.modal button:hover{
+  background:#245477;
+}
+
+
+/* =========================
+   NOTIFICACIONES
+========================= */
+
+.note{
+  position:fixed;
+
+  right:15px;
+  top:80px;
+
+  z-index:30;
+
+  background:#0d1b2c;
+
+  border-left:
+    3px solid var(--blue);
+
+  padding:
+    10px 15px;
+
+  border-radius:5px;
+
+  font-size:12px;
+
+  box-shadow:
+    0 8px 25px #0007;
+
+  animation:
+    noteIn .25s ease;
+}
+
+@keyframes noteIn{
+  from{
+    opacity:0;
+    transform:translateX(30px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+
+
+/* =========================
+   EFECTOS
+========================= */
+
+@keyframes pulse{
+  0%,100%{
+    box-shadow:
+      0 0 10px #00aaff22;
+  }
+
+  50%{
+    box-shadow:
+      0 0 30px #00aaff55;
+  }
+}
+
+.heroChar{
+  animation:
+    pulse 3s infinite;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:900px){
+
+  nav{
+    grid-template-columns:
+      repeat(3,1fr);
+  }
+
+  .grid{
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+
+  .custom{
+    grid-template-columns:
+      1fr;
+  }
+
+  .hero{
+    padding:
+      35px 20px;
+  }
+
+  .heroChar{
+    display:none;
+  }
+
+  .touch{
+    display:flex;
+  }
+
+  .weaponHud{
+    bottom:120px;
+  }
+
+  .map{
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+
+}
+
+
+@media(max-width:600px){
+
+  header{
+    padding:
+      10px 13px;
+
+    height:62px;
+  }
+
+  .brand strong{
+    font-size:13px;
+  }
+
+  .res{
+    font-size:9px;
+  }
+
+  .hero{
+    min-height:360px;
+  }
+
+  .hero h1{
+    font-size:45px;
+  }
+
+  .hero p{
+    font-size:13px;
+  }
+
+  nav{
+    grid-template-columns:
+      repeat(2,1fr);
+
+    padding:
+      10px 13px;
+  }
+
+  nav button{
+    min-height:90px;
+  }
+
+  .filters{
+    grid-template-columns:
+      1fr;
+  }
+
+  .grid{
+    grid-template-columns:
+      1fr;
+
+    padding:
+      10px 13px;
+  }
+
+  .map{
+    grid-template-columns:
+      1fr;
+  }
+
+  .custom{
+    padding:
+      0 13px;
+  }
+
+  .hud{
+    gap:6px;
+
+    padding:
+      7px;
+  }
+
+  .hud>div{
+    min-width:0;
+  }
+
+  .hud>div:nth-child(2){
+    display:none;
+  }
+
+  .hud>div:nth-child(3),
+  .hud>div:nth-child(4){
+    font-size:8px;
+  }
+
+  .weaponHud{
+    right:5px;
+
+    bottom:120px;
+
+    padding:7px;
+
+    gap:8px;
+  }
+
+  .weaponHud b{
+    max-width:120px;
+
+    font-size:9px;
+  }
+
+  .weaponHud strong{
+    font-size:20px;
+  }
+
+  .weaponHud>span{
+    width:32px;
+    height:32px;
+
+    font-size:22px;
+  }
+
+  footer{
+    font-size:8px;
+  }
+
+}
+
+
+@media(max-width:380px){
+
+  nav button{
+    min-height:82px;
+  }
+
+  nav strong{
+    font-size:9px;
+  }
+
+  nav small{
+    font-size:7px;
+  }
+
+  .hero h1{
+    font-size:38px;
+  }
+
+  .touch button{
+    width:44px;
+    height:44px;
+  }
+
+  .touch .dpad{
+    grid-template-columns:
+      repeat(3,44px);
+  }
+
+}
