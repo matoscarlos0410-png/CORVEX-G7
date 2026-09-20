@@ -1,15 +1,13 @@
 /* =========================================================
-   SCORVEX G7 — SISTEMA DE 1000 ARMAS
+   SCORVEX G7 — WEAPONS SYSTEM
+   1000 armas
+   8 rarezas
+   10 tipos
+   Solo moneda virtual del juego
    ========================================================= */
 
 (() => {
   "use strict";
-
-  const TOTAL_WEAPONS = 1000;
-
-  /* =========================
-     RAREZAS
-  ========================= */
 
   const RARITIES = [
     {
@@ -17,787 +15,611 @@
       name: "Común",
       minPrice: 5000,
       maxPrice: 15000,
-      power: 1.00
+      power: 1.00,
+      color: "#b8c0cc"
     },
     {
       id: "uncommon",
       name: "Poco común",
       minPrice: 15000,
       maxPrice: 50000,
-      power: 1.12
+      power: 1.12,
+      color: "#4ade80"
     },
     {
       id: "rare",
       name: "Raro",
       minPrice: 50000,
       maxPrice: 150000,
-      power: 1.28
+      power: 1.28,
+      color: "#60a5fa"
     },
     {
       id: "epic",
       name: "Épico",
       minPrice: 150000,
       maxPrice: 500000,
-      power: 1.48
+      power: 1.48,
+      color: "#c084fc"
     },
     {
       id: "legendary",
       name: "Legendario",
       minPrice: 500000,
       maxPrice: 1500000,
-      power: 1.75
+      power: 1.75,
+      color: "#facc15"
     },
     {
       id: "mythic",
       name: "Mítico",
       minPrice: 1500000,
       maxPrice: 5000000,
-      power: 2.10
+      power: 2.10,
+      color: "#fb7185"
     },
     {
       id: "ancient",
       name: "Ancestral",
       minPrice: 5000000,
       maxPrice: 15000000,
-      power: 2.55
+      power: 2.55,
+      color: "#f97316"
     },
     {
       id: "omega",
       name: "Omega",
       minPrice: 15000000,
       maxPrice: 50000000,
-      power: 3.10
+      power: 3.10,
+      color: "#22d3ee"
     }
   ];
-
-  /* =========================
-     TIPOS DE ARMAS
-  ========================= */
 
   const TYPES = [
     {
       id: "rifle",
       name: "Rifle",
-      damage: 42,
+      damage: 34,
       fireRate: 8,
       range: 85,
-      magazine: 30
+      magazine: 30,
+      accuracy: 82,
+      reload: 2.1
     },
     {
       id: "smg",
-      name: "Subfusil",
-      damage: 28,
+      name: "SMG",
+      damage: 24,
       fireRate: 14,
       range: 55,
-      magazine: 40
+      magazine: 36,
+      accuracy: 74,
+      reload: 1.7
     },
     {
       id: "shotgun",
       name: "Escopeta",
-      damage: 85,
-      fireRate: 3,
-      range: 32,
-      magazine: 8
+      damage: 72,
+      fireRate: 2.4,
+      range: 35,
+      magazine: 8,
+      accuracy: 58,
+      reload: 2.5
     },
     {
       id: "sniper",
       name: "Francotirador",
-      damage: 125,
-      fireRate: 1,
+      damage: 105,
+      fireRate: 1.2,
       range: 100,
-      magazine: 5
+      magazine: 5,
+      accuracy: 96,
+      reload: 2.8
     },
     {
       id: "pistol",
       name: "Pistola",
-      damage: 35,
+      damage: 27,
       fireRate: 7,
       range: 60,
-      magazine: 15
+      magazine: 15,
+      accuracy: 80,
+      reload: 1.5
     },
     {
       id: "laser",
       name: "Láser",
-      damage: 50,
-      fireRate: 10,
+      damage: 31,
+      fireRate: 11,
       range: 90,
-      magazine: 25
+      magazine: 28,
+      accuracy: 94,
+      reload: 2.0
     },
     {
       id: "plasma",
       name: "Plasma",
-      damage: 65,
+      damage: 43,
       fireRate: 7,
-      range: 80,
-      magazine: 20
+      range: 82,
+      magazine: 24,
+      accuracy: 88,
+      reload: 2.2
     },
     {
       id: "energy",
       name: "Energía",
-      damage: 58,
-      fireRate: 9,
-      range: 88,
-      magazine: 28
+      damage: 38,
+      fireRate: 10,
+      range: 78,
+      magazine: 32,
+      accuracy: 90,
+      reload: 1.9
     },
     {
       id: "arc",
       name: "Arco",
-      damage: 105,
-      fireRate: 2,
-      range: 95,
-      magazine: 6
+      damage: 61,
+      fireRate: 3.2,
+      range: 92,
+      magazine: 12,
+      accuracy: 91,
+      reload: 2.4
     },
     {
       id: "vortex",
       name: "Vórtice",
-      damage: 90,
-      fireRate: 4,
-      range: 75,
-      magazine: 12
+      damage: 52,
+      fireRate: 5.5,
+      range: 88,
+      magazine: 18,
+      accuracy: 86,
+      reload: 2.3
     }
   ];
 
-  /* =========================
-     NOMBRES
-  ========================= */
-
   const PREFIXES = [
-    "Sombra",
-    "Titán",
-    "Fénix",
-    "Cobra",
-    "Nébula",
-    "Vórtice",
-    "Trueno",
-    "Dragón",
-    "Fantasma",
-    "Inferno",
-    "Centella",
-    "Halcón",
-    "León",
-    "Raptor",
-    "Guardián",
-    "Destructor",
-    "Cazador",
-    "Tormenta",
-    "Avalancha",
-    "Cometa",
-    " Eclipse",
     "Nova",
-    "Ares",
-    "Atlas",
-    "Zeus",
-    "Kraken",
-    "Lobo",
-    "Pantera",
-    "Escorpión",
-    "Serpiente",
-    "Demonio",
-    "Coloso",
-    "Imperial",
-    "Supremo",
-    "Radiante",
-    "Oscuro",
+    "Titan",
+    "Shadow",
+    "Phantom",
+    "Inferno",
+    "Frost",
+    "Storm",
+    "Viper",
+    "Raptor",
+    "Spectral",
+    "Quantum",
     "Solar",
     "Lunar",
-    "Quantum",
-    "Omega"
+    "Void",
+    "Apex",
+    "Omega",
+    "Cyber",
+    "Thunder",
+    "Venom",
+    "Crimson",
+    "Neon",
+    "Obsidian",
+    "Eclipse",
+    "Galaxy",
+    "Pulse",
+    "Hyper",
+    "Atomic",
+    "Vector",
+    "Zero",
+    "Delta",
+    "Alpha",
+    "Sigma",
+    "Phantom-X",
+    "Titan-X",
+    "Nightfall",
+    "Starfall",
+    "Darkstar",
+    "Iron",
+    "Royal",
+    "Ultimate"
   ];
 
   const SUFFIXES = [
     "X",
-    "Alpha",
-    "Beta",
-    "Zero",
     "Prime",
-    "Pro",
+    "Mk-II",
+    "Mk-III",
     "Elite",
-    "Max",
     "Ultra",
-    "One",
-    "Two",
-    "V7",
-    "V8",
-    "V9",
-    "G7",
-    "G8",
-    "MK-I",
-    "MK-II",
-    "MK-III",
+    "Pro",
+    "Max",
     "EX",
-    "RX",
-    "ZX",
-    "NX",
-    "DX",
+    "Zero",
     "Core",
-    "Infinity"
+    "Edge",
+    "Force",
+    "Burst",
+    "Strike",
+    "Hunter",
+    "Breaker",
+    "Reaper",
+    "Rage",
+    "Guardian",
+    "Destroyer",
+    "Sentinel",
+    "Overdrive",
+    "Infinity",
+    "Genesis"
   ];
 
-  /* =========================
-     COLORES DE RAREZA
-  ========================= */
+  /*
+   * Icono SVG interno.
+   * No utiliza imágenes externas.
+   */
+  function createWeaponIcon(type, rarityColor) {
+    const color = rarityColor || "#60a5fa";
 
-  const RARITY_COLORS = {
-    common: "#9aa4b2",
-    uncommon: "#42d66b",
-    rare: "#42a5ff",
-    epic: "#b45cff",
-    legendary: "#ff9f32",
-    mythic: "#ff3d81",
-    ancient: "#00e5ff",
-    omega: "#ffe600"
-  };
+    const shapes = {
+      rifle: `
+        <path d="M12 30h72"/>
+        <path d="M26 24h30l12 6h20v8H62l-12 6H34v-8H20z"/>
+        <path d="M42 44l-7 14h14l7-14"/>
+        <path d="M72 30v-9"/>
+      `,
 
-  /* =========================
-     UTILIDADES
-  ========================= */
+      smg: `
+        <path d="M14 31h58l13 7-13 7H45l-8 10H25l5-10H14z"/>
+        <path d="M49 45l-5 17h12l5-17"/>
+        <path d="M70 31v-9"/>
+      `,
 
-  function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
-  }
+      shotgun: `
+        <path d="M10 28h72v11H45l-11 7H22l6-7H10z"/>
+        <path d="M38 39l-4 20h13l5-20"/>
+        <path d="M74 28v-10"/>
+      `,
 
-  function randomRange(min, max) {
-    return Math.floor(
-      Math.random() * (max - min + 1)
-    ) + min;
-  }
+      sniper: `
+        <path d="M10 31h70l10 6-10 6H52l-12 7H25l5-7H10z"/>
+        <path d="M47 43l-6 17h13l5-17"/>
+        <circle cx="60" cy="25" r="6"/>
+        <path d="M66 25h16"/>
+      `,
 
-  function roundPrice(value) {
-    if (value < 10000) {
-      return Math.round(value / 500) * 500;
-    }
+      pistol: `
+        <path d="M18 29h57l10 7-10 7H49l-7 8H28l5-8H18z"/>
+        <path d="M45 43l-4 18h13l5-18"/>
+      `,
 
-    if (value < 100000) {
-      return Math.round(value / 1000) * 1000;
-    }
+      laser: `
+        <path d="M12 34h58l18-8"/>
+        <path d="M12 34l18-8h40"/>
+        <path d="M45 34l-7 25h14l6-25"/>
+        <circle cx="82" cy="25" r="5"/>
+      `,
 
-    if (value < 1000000) {
-      return Math.round(value / 10000) * 10000;
-    }
+      plasma: `
+        <path d="M10 32h62l15 7-15 7H46l-8 10H25l6-10H10z"/>
+        <circle cx="66" cy="39" r="8"/>
+        <path d="M47 46l-5 15h13l5-15"/>
+      `,
 
-    return Math.round(value / 100000) * 100000;
-  }
+      energy: `
+        <path d="M10 34h62l16 6-16 6H46l-8 10H25l6-10H10z"/>
+        <path d="M62 26l-7 12h10l-7 14"/>
+        <path d="M48 46l-5 15h12l5-15"/>
+      `,
 
-  function formatMoney(value) {
-    return Number(value).toLocaleString("es-PE");
-  }
+      arc: `
+        <path d="M14 34h62l10 6-10 6H48l-9 10H26l6-10H14z"/>
+        <path d="M60 22c8 5 8 14 0 19"/>
+        <path d="M70 18c13 8 13 23 0 31"/>
+      `,
 
-  /* =========================
-     ICONO SVG
-  ========================= */
-
-  function createWeaponIcon(type, rarity) {
-    const color =
-      RARITY_COLORS[rarity] || "#ffffff";
-
-    let shape = "";
-
-    switch (type) {
-
-      case "rifle":
-        shape = `
-          <rect x="12" y="27" width="38" height="10" rx="4"/>
-          <rect x="46" y="24" width="16" height="7" rx="2"/>
-          <rect x="20" y="37" width="9" height="15" rx="2"/>
-          <rect x="5" y="29" width="12" height="5" rx="2"/>
-        `;
-        break;
-
-      case "smg":
-        shape = `
-          <rect x="13" y="28" width="40" height="10" rx="4"/>
-          <rect x="45" y="24" width="14" height="6" rx="2"/>
-          <path d="M24 38 L35 38 L30 52 L22 52 Z"/>
-          <rect x="7" y="30" width="10" height="4"/>
-        `;
-        break;
-
-      case "shotgun":
-        shape = `
-          <rect x="10" y="28" width="48" height="8" rx="3"/>
-          <rect x="49" y="24" width="12" height="5"/>
-          <path d="M23 36 L35 36 L31 51 L20 51 Z"/>
-          <rect x="6" y="30" width="12" height="4"/>
-        `;
-        break;
-
-      case "sniper":
-        shape = `
-          <rect x="8" y="30" width="48" height="7" rx="3"/>
-          <rect x="43" y="25" width="20" height="5" rx="2"/>
-          <circle cx="37" cy="27" r="6"/>
-          <rect x="20" y="37" width="8" height="15"/>
-          <rect x="3" y="31" width="12" height="4"/>
-        `;
-        break;
-
-      case "pistol":
-        shape = `
-          <rect x="17" y="24" width="35" height="10" rx="3"/>
-          <path d="M29 34 L43 34 L37 52 L27 52 Z"/>
-          <rect x="50" y="27" width="10" height="5"/>
-        `;
-        break;
-
-      case "laser":
-        shape = `
-          <rect x="10" y="29" width="42" height="8" rx="4"/>
-          <rect x="47" y="25" width="16" height="5"/>
-          <circle cx="56" cy="33" r="7"/>
-          <rect x="22" y="37" width="8" height="14"/>
-        `;
-        break;
-
-      case "plasma":
-        shape = `
-          <rect x="8" y="27" width="44" height="13" rx="6"/>
-          <circle cx="54" cy="33" r="10"/>
-          <path d="M24 40 L36 40 L31 54 L21 54 Z"/>
-        `;
-        break;
-
-      case "energy":
-        shape = `
-          <path d="M7 33 L20 22 L52 27 L62 33 L52 39 L20 44 Z"/>
-          <circle cx="51" cy="33" r="5"/>
-          <path d="M27 42 L38 42 L33 55 L24 55 Z"/>
-        `;
-        break;
-
-      case "arc":
-        shape = `
-          <path d="M8 45 Q30 8 58 25" fill="none" stroke="${color}" stroke-width="6"/>
-          <line x1="17" y1="42" x2="56" y2="26"
-                stroke="${color}" stroke-width="2"/>
-          <circle cx="13" cy="47" r="4"/>
-        `;
-        break;
-
-      case "vortex":
-        shape = `
-          <circle cx="33" cy="33" r="20"
-                  fill="none"
-                  stroke="${color}"
-                  stroke-width="7"/>
-          <circle cx="33" cy="33" r="9"
-                  fill="none"
-                  stroke="${color}"
-                  stroke-width="4"/>
-          <path d="M33 13 L43 20 L33 24"/>
-        `;
-        break;
-    }
+      vortex: `
+        <path d="M12 34h62l12 6-12 6H47l-8 11H25l6-11H12z"/>
+        <circle cx="66" cy="40" r="12"/>
+        <circle cx="66" cy="40" r="5"/>
+        <path d="M48 46l-5 15h12l5-15"/>
+      `
+    };
 
     return `
       <svg
+        viewBox="0 0 100 80"
+        width="70"
+        height="56"
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 68 68"
-        width="68"
-        height="68"
         aria-hidden="true"
       >
-
-        <defs>
-          <filter id="glow-${type}-${rarity}">
-            <feGaussianBlur
-              stdDeviation="2.5"
-              result="blur"
-            />
-            <feMerge>
-              <feMergeNode in="blur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-
-        <circle
-          cx="34"
-          cy="34"
-          r="30"
-          fill="rgba(10,15,25,.92)"
-          stroke="${color}"
-          stroke-width="2"
-        />
-
         <g
-          fill="${color}"
+          fill="none"
           stroke="${color}"
-          filter="url(#glow-${type}-${rarity})"
+          stroke-width="4"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
-          ${shape}
+          ${shapes[type] || shapes.rifle}
         </g>
-
       </svg>
     `;
   }
 
-  /* =========================
-     RAREZA POR POSICIÓN
-  ========================= */
-
-  function getRarityByIndex(index) {
-
-    const percentage =
-      index / TOTAL_WEAPONS;
-
-    if (percentage < 0.18) {
-      return RARITIES[0];
-    }
-
-    if (percentage < 0.34) {
-      return RARITIES[1];
-    }
-
-    if (percentage < 0.50) {
-      return RARITIES[2];
-    }
-
-    if (percentage < 0.67) {
-      return RARITIES[3];
-    }
-
-    if (percentage < 0.81) {
-      return RARITIES[4];
-    }
-
-    if (percentage < 0.92) {
-      return RARITIES[5];
-    }
-
-    if (percentage < 0.98) {
-      return RARITIES[6];
-    }
-
-    return RARITIES[7];
+  function randomBetween(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  /* =========================
-     CREAR NOMBRE
-  ========================= */
+  function rarityForIndex(index) {
+    const block = Math.floor(index / 125);
+    return RARITIES[Math.min(block, RARITIES.length - 1)];
+  }
 
-  function createWeaponName(index, type) {
+  function typeForIndex(index) {
+    return TYPES[index % TYPES.length];
+  }
+
+  function createWeapon(index) {
+    const rarity = rarityForIndex(index);
+    const type = typeForIndex(index);
 
     const prefix =
-      PREFIXES[
-        index % PREFIXES.length
-      ].trim();
+      PREFIXES[index % PREFIXES.length];
 
     const suffix =
-      SUFFIXES[
-        Math.floor(index / PREFIXES.length)
-        % SUFFIXES.length
-      ];
+      SUFFIXES[Math.floor(index / PREFIXES.length) % SUFFIXES.length];
 
-    const typeName =
-      TYPES.find(t => t.id === type)?.name ||
-      "Arma";
+    const number =
+      String(index + 1).padStart(4, "0");
 
-    return `${prefix} ${typeName} ${suffix}`;
-  }
+    const price =
+      randomBetween(rarity.minPrice, rarity.maxPrice);
 
-  /* =========================
-     GENERADOR
-  ========================= */
+    const powerMultiplier = rarity.power;
 
-  function generate1000Weapons() {
+    const damage = Math.round(
+      type.damage * powerMultiplier
+    );
 
-    const result = {};
+    const fireRate = Number(
+      (type.fireRate * (1 + (powerMultiplier - 1) * 0.15))
+      .toFixed(2)
+    );
 
-    for (
-      let index = 1;
-      index <= TOTAL_WEAPONS;
-      index++
-    ) {
+    const range = Math.min(
+      100,
+      Math.round(type.range * (1 + (powerMultiplier - 1) * 0.08))
+    );
 
-      const type =
-        TYPES[
-          (index - 1) % TYPES.length
-        ];
+    const magazine = Math.round(
+      type.magazine * (1 + (powerMultiplier - 1) * 0.12)
+    );
 
-      const rarity =
-        getRarityByIndex(index - 1);
+    const accuracy = Math.min(
+      100,
+      Math.round(type.accuracy + (powerMultiplier - 1) * 8)
+    );
 
-      const power =
-        rarity.power;
+    const reload = Number(
+      Math.max(
+        0.9,
+        type.reload / (1 + (powerMultiplier - 1) * 0.12)
+      ).toFixed(2)
+    );
 
-      const damage = Math.round(
-        type.damage * power
-      );
+    const unlockLevel = Math.min(
+      100,
+      Math.max(
+        1,
+        Math.floor((index + 1) / 10)
+      )
+    );
 
-      const fireRate = Number(
-        (
-          type.fireRate *
-          (0.90 + power * 0.08)
-        ).toFixed(2)
-      );
+    const exclusive =
+      rarity.id === "omega" ||
+      rarity.id === "ancient";
 
-      const range = Math.round(
-        clamp(
-          type.range * (0.92 + power * 0.06),
-          20,
-          120
-        )
-      );
+    return {
+      id: `weapon_${number}`,
 
-      const magazine = Math.round(
-        type.magazine *
-        (0.95 + power * 0.05)
-      );
+      name: `${prefix} ${type.name} ${suffix}`,
 
-      const accuracy = Math.round(
-        clamp(
-          58 +
-          power * 12 +
-          (index % 13),
-          55,
-          99
-        )
-      );
+      icon: createWeaponIcon(
+        type.id,
+        rarity.color
+      ),
 
-      const reload = Number(
-        clamp(
-          2.8 -
-          power * 0.25 -
-          (index % 4) * 0.08,
-          0.8,
-          3
-        ).toFixed(2)
-      );
+      price,
 
-      const basePrice =
-        rarity.minPrice +
-        (
-          (
-            index * 7919
-          ) %
-          (
-            rarity.maxPrice -
-            rarity.minPrice +
-            1
-          )
-        );
+      damage,
 
-      const price =
-        roundPrice(
-          basePrice
-        );
+      fireRate,
 
-      const id =
-        `weapon_${String(index).padStart(4, "0")}`;
+      range,
 
-      result[id] = {
+      magazine,
 
-        id,
+      accuracy,
 
-        number: index,
+      reload,
 
-        name:
-          createWeaponName(
-            index,
-            type.id
-          ),
+      power: Number(
+        powerMultiplier.toFixed(2)
+      ),
 
-        type:
-          type.id,
+      type: type.id,
 
-        typeName:
-          type.name,
+      typeName: type.name,
 
-        rarity:
-          rarity.id,
+      rarity: rarity.id,
 
-        rarityName:
-          rarity.name,
+      rarityName: rarity.name,
 
-        rarityColor:
-          RARITY_COLORS[
-            rarity.id
-          ],
+      rarityColor: rarity.color,
 
-        price,
+      unlockLevel,
 
-        currency:
-          "coins",
+      exclusive,
 
-        icon:
-          createWeaponIcon(
-            type.id,
-            rarity.id
-          ),
-
-        stats: {
-
-          damage,
-
-          fireRate,
-
-          range,
-
-          magazine,
-
-          accuracy,
-
-          reload,
-
-          power:
-            Number(power.toFixed(2))
-
-        },
-
-        description:
-          `${rarity.name} ${type.name} de la colección SCORVEX G7.`,
-
-        unlockLevel:
-          Math.max(
-            1,
-            Math.floor(
-              index / 18
-            )
-          ),
-
-        exclusive:
-          rarity.id === "omega" ||
-          rarity.id === "ancient",
-
-        skinSlots:
-          rarity.id === "common"
-            ? 1
-            : rarity.id === "uncommon"
+      skinSlots:
+        rarity.id === "common"
+          ? 1
+          : rarity.id === "uncommon"
+            ? 2
+            : rarity.id === "rare"
               ? 2
-              : rarity.id === "rare"
+              : rarity.id === "epic"
                 ? 3
                 : 4,
 
-        tags: [
-          rarity.id,
-          type.id,
-          `g7-${index}`
-        ]
-
-      };
-    }
-
-    return result;
+      tags: [
+        rarity.name,
+        type.name,
+        exclusive
+          ? "Exclusiva"
+          : "Estándar"
+      ]
+    };
   }
 
-  /* =========================
-     CREAR LAS 1000 ARMAS
-  ========================= */
+  /*
+   * Generamos exactamente 1000 armas.
+   */
+  const SCORVEX_WEAPONS = {};
 
-  const weapons =
-    generate1000Weapons();
+  for (let i = 0; i < 1000; i++) {
+    const weapon = createWeapon(i);
 
-  /* =========================
-     COMPROBACIÓN
-  ========================= */
+    SCORVEX_WEAPONS[weapon.id] = weapon;
+  }
 
-  console.assert(
-    Object.keys(weapons).length === 1000,
-    "SCORVEX G7: deben existir exactamente 1000 armas."
-  );
+  /*
+   * Arma inicial.
+   */
+  const SCORVEX_STARTER_WEAPON =
+    "weapon_0001";
 
-  console.assert(
-    weapons.weapon_0001,
-    "SCORVEX G7: falta weapon_0001."
-  );
+  /*
+   * Buscar arma por ID.
+   */
+  function getScorvexWeapon(id) {
+    return SCORVEX_WEAPONS[id] || null;
+  }
 
-  console.assert(
-    weapons.weapon_1000,
-    "SCORVEX G7: falta weapon_1000."
-  );
+  /*
+   * Filtrar por rareza.
+   */
+  function getScorvexWeaponsByRarity(rarity) {
+    return Object.values(SCORVEX_WEAPONS)
+      .filter(
+        weapon => weapon.rarity === rarity
+      );
+  }
 
-  /* =========================
-     ARMAS INICIALES
-  ========================= */
+  /*
+   * Filtrar por tipo.
+   */
+  function getScorvexWeaponsByType(type) {
+    return Object.values(SCORVEX_WEAPONS)
+      .filter(
+        weapon => weapon.type === type
+      );
+  }
 
-  const starterWeapon =
-    weapons.weapon_0001;
+  /*
+   * Obtener armas muy caras.
+   */
+  function getScorvexExpensiveWeapons(
+    minimumPrice = 1000000
+  ) {
+    return Object.values(SCORVEX_WEAPONS)
+      .filter(
+        weapon => weapon.price >= minimumPrice
+      )
+      .sort(
+        (a, b) => b.price - a.price
+      );
+  }
 
-  /* =========================
-     FUNCIONES PÚBLICAS
-  ========================= */
+  /*
+   * Formato de monedas virtuales.
+   */
+  function formatScorvexMoney(value) {
+    const amount = Number(value) || 0;
 
+    return amount.toLocaleString(
+      "es-PE"
+    );
+  }
+
+  /*
+   * Estadísticas generales.
+   */
+  const SCORVEX_WEAPON_STATS = {
+    total: Object.keys(SCORVEX_WEAPONS).length,
+
+    rarities: RARITIES.map(
+      rarity => rarity.id
+    ),
+
+    types: TYPES.map(
+      type => type.id
+    ),
+
+    highestPrice: Math.max(
+      ...Object.values(SCORVEX_WEAPONS)
+        .map(weapon => weapon.price)
+    ),
+
+    highestDamage: Math.max(
+      ...Object.values(SCORVEX_WEAPONS)
+        .map(weapon => weapon.damage)
+    )
+  };
+
+  /*
+   * Exponer al juego.
+   */
   window.SCORVEX_WEAPONS =
-    weapons;
+    SCORVEX_WEAPONS;
 
   window.SCORVEX_STARTER_WEAPON =
-    starterWeapon;
+    SCORVEX_STARTER_WEAPON;
+
+  window.SCORVEX_WEAPON_STATS =
+    SCORVEX_WEAPON_STATS;
+
+  window.SCORVEX_WEAPON_RARITIES =
+    RARITIES;
+
+  window.SCORVEX_WEAPON_TYPES =
+    TYPES;
 
   window.getScorvexWeapon =
-    function(id) {
-      return weapons[id] || null;
-    };
+    getScorvexWeapon;
 
   window.getScorvexWeaponsByRarity =
-    function(rarity) {
-
-      return Object.values(
-        weapons
-      ).filter(
-        weapon =>
-          weapon.rarity === rarity
-      );
-    };
+    getScorvexWeaponsByRarity;
 
   window.getScorvexWeaponsByType =
-    function(type) {
-
-      return Object.values(
-        weapons
-      ).filter(
-        weapon =>
-          weapon.type === type
-      );
-    };
+    getScorvexWeaponsByType;
 
   window.getScorvexExpensiveWeapons =
-    function(minPrice = 1000000) {
-
-      return Object.values(
-        weapons
-      ).filter(
-        weapon =>
-          weapon.price >= minPrice
-      );
-    };
+    getScorvexExpensiveWeapons;
 
   window.formatScorvexMoney =
-    formatMoney;
+    formatScorvexMoney;
 
-  /* =========================
-     INFORMACIÓN EN CONSOLA
-  ========================= */
-
+  /*
+   * Comprobación.
+   */
   console.log(
-    "======================================"
+    `SCORVEX G7: ${Object.keys(SCORVEX_WEAPONS).length} armas cargadas.`
   );
 
-  console.log(
-    "       SCORVEX G7 — ARMAS"
-  );
-
-  console.log(
-    "======================================"
-  );
-
-  console.log(
-    `Armas creadas: ${Object.keys(weapons).length}`
-  );
-
-  console.log(
-    "Arma inicial:",
-    starterWeapon.name
-  );
-
-  console.log(
-    "Precio inicial:",
-    formatMoney(
-      starterWeapon.price
-    )
-  );
-
-  console.log(
-    "======================================"
-  );
+  if (
+    Object.keys(SCORVEX_WEAPONS).length !== 1000
+  ) {
+    console.error(
+      "ERROR: SCORVEX G7 no tiene exactamente 1000 armas."
+    );
+  }
 
 })();
