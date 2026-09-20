@@ -1,9 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#050a14">
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+
+  <meta name="theme-color" content="#070b16">
+
+  <meta
+    name="description"
+    content="SCORVEX G7 - Arena táctica futurista"
+  >
 
   <title>SCORVEX G7</title>
 
@@ -12,744 +22,987 @@
 
 <body>
 
-  <!-- =========================
-       PANTALLA DE CARGA
-  ========================== -->
+  <!-- =========================================================
+       PANTALLA DE INICIO
+  ========================================================== -->
 
-  <div id="boot" class="boot">
+  <div id="bootScreen" class="boot-screen">
 
-    <div class="logo">
+    <div class="boot-logo">
+      <div class="boot-symbol">
+        ⚡
+      </div>
 
-      <svg viewBox="0 0 700 700">
-
-        <defs>
-
-          <radialGradient id="b">
-            <stop stop-color="#168cff"/>
-            <stop offset=".55" stop-color="#073b91"/>
-            <stop offset="1" stop-color="#020712"/>
-          </radialGradient>
-
-          <linearGradient id="o">
-            <stop stop-color="#fff"/>
-            <stop offset=".35" stop-color="#ffb000"/>
-            <stop offset="1" stop-color="#ff3d00"/>
-          </linearGradient>
-
-          <linearGradient id="m">
-            <stop stop-color="#fff"/>
-            <stop offset=".6" stop-color="#bcd5f0"/>
-            <stop offset="1" stop-color="#60758d"/>
-          </linearGradient>
-
-          <linearGradient id="g">
-            <stop stop-color="#fff"/>
-            <stop offset=".35" stop-color="#00b7ff"/>
-            <stop offset="1" stop-color="#075cff"/>
-          </linearGradient>
-
-        </defs>
-
-
-        <rect
-          width="700"
-          height="700"
-          fill="#000"
-        />
-
-
-        <circle
-          cx="350"
-          cy="350"
-          r="315"
-          fill="url(#b)"
-        />
-
-
-        <path
-          d="
-            M350 35
-            A315 315 0 0 1 350 665
-            L350 35
-            Z
-          "
-          fill="url(#o)"
-        />
-
-
-        <circle
-          cx="350"
-          cy="350"
-          r="320"
-          fill="none"
-          stroke="#00baff"
-          stroke-width="8"
-        />
-
-
-        <path
-          d="
-            M350 30
-            A320 320 0 0 1 350 670
-          "
-          fill="none"
-          stroke="#ff4d00"
-          stroke-width="9"
-        />
-
-
-        <!-- CIUDAD -->
-
-        <g
-          fill="#03070d"
-          opacity=".7"
-        >
-
-          <path
-            d="
-              M20 530
-              l50-30
-              v-60
-              h35
-              v-60
-              h30
-              v90
-              h40
-              v-60
-              h35
-              v120
-              z
-            "
-          />
-
-          <path
-            d="
-              M500 550
-              V450
-              h30
-              v-70
-              h30
-              v50
-              h30
-              v-80
-              h35
-              v150
-              h55
-              v50
-              z
-            "
-          />
-
-        </g>
-
-
-        <!-- ARMAS DECORATIVAS -->
-
-        <g
-          fill="none"
-          stroke="#02060b"
-          stroke-width="20"
-        >
-
-          <path d="M80 170l135 105"/>
-
-          <path d="M620 170L485 275"/>
-
-        </g>
-
-
-        <!-- CASCO -->
-
-        <path
-          d="
-            M235 190
-            Q245 110 350 92
-            Q455 110 465 190
-            l-15 70
-            H250
-            z
-          "
-          fill="#111820"
-          stroke="#506579"
-          stroke-width="8"
-        />
-
-
-        <!-- VISOR -->
-
-        <path
-          d="
-            M245 190
-            q105-35 210 0
-            l-20 80
-            q-85 25-170 0
-            z
-          "
-          fill="#06101b"
-          stroke="#213b55"
-          stroke-width="8"
-        />
-
-
-        <!-- VISOR AZUL -->
-
-        <path
-          d="
-            M260 200
-            q45-20 90-20
-            v95
-            q-50-5-80-25
-            z
-          "
-          fill="#008dff"
-        />
-
-
-        <!-- VISOR NARANJA -->
-
-        <path
-          d="
-            M350 180
-            q45 0 90 20
-            l-10 50
-            q-30 20-80 25
-            z
-          "
-          fill="#ff5a00"
-        />
-
-
-        <!-- CUELLO -->
-
-        <path
-          d="
-            M270 265
-            h160
-            l40 65
-            H230
-            z
-          "
-          fill="#0d151d"
-          stroke="#3b5064"
-          stroke-width="7"
-        />
-
-
-        <!-- SCORVEX -->
-
-        <text
-          x="350"
-          y="405"
-          text-anchor="middle"
-          font-family="Impact,Arial Black"
-          font-size="105"
-          fill="url(#m)"
-          stroke="#05080d"
-          stroke-width="12"
-          paint-order="stroke"
-        >
-          SCORVEX
-        </text>
-
-
-        <!-- X -->
-
-        <text
-          x="535"
-          y="405"
-          text-anchor="middle"
-          font-family="Impact,Arial Black"
-          font-size="112"
-          fill="url(#o)"
-        >
-          X
-        </text>
-
-
-        <!-- G -->
-
-        <text
-          x="310"
-          y="535"
-          text-anchor="middle"
-          font-family="Impact,Arial Black"
-          font-size="145"
-          fill="url(#g)"
-          stroke="#001a52"
-          stroke-width="12"
-          paint-order="stroke"
-        >
-          G
-        </text>
-
-
-        <!-- 7 -->
-
-        <text
-          x="430"
-          y="535"
-          text-anchor="middle"
-          font-family="Impact,Arial Black"
-          font-size="145"
-          fill="url(#o)"
-          stroke="#8a2600"
-          stroke-width="12"
-          paint-order="stroke"
-        >
-          7
-        </text>
-
-      </svg>
-
+      <h1>SCORVEX</h1>
+      <span>G7</span>
     </div>
 
-
-    <div class="load">
-      <i id="progress"></i>
+    <div class="boot-loading">
+      <div id="bootBar" class="boot-bar"></div>
     </div>
 
     <p id="bootText">
-      Cargando SCORVEX...
+      INICIANDO SISTEMA...
     </p>
 
   </div>
 
 
-  <!-- =========================
-       APLICACIÓN
-  ========================== -->
+  <!-- =========================================================
+       APLICACIÓN PRINCIPAL
+  ========================================================== -->
 
-  <main id="app" class="hidden">
+  <main id="app" class="app hidden">
 
+    <!-- =======================================================
+         HEADER
+    ======================================================== -->
 
-    <!-- =========================
-         MENÚ
-    ========================== -->
+    <header class="main-header">
 
-    <section
-      id="menu"
-      class="screen"
-    >
+      <div class="brand">
 
-      <header>
-
-        <div class="brand">
-
-          <b>
-            S
-          </b>
-
-          <span>
-
-            <strong>
-              SCORVEX
-            </strong>
-
-            <small>
-              G7 BATTLE ARENA
-            </small>
-
-          </span>
-
+        <div class="brand-icon">
+          ⚡
         </div>
 
-
-        <div class="res">
-
-          ◈
-          <b id="coins">
-            0
-          </b>
-
-          &nbsp;&nbsp;
-
-          ◆
-          <b id="crystals">
-            0
-          </b>
-
-          &nbsp;&nbsp;
-
-          NIV
-          <b id="level">
-            1
-          </b>
-
+        <div class="brand-text">
+          <strong>SCORVEX</strong>
+          <span>G7</span>
         </div>
 
-      </header>
+      </div>
 
 
-      <!-- HERO -->
+      <div class="player-status">
 
-      <div class="hero">
+        <div class="currency currency-coins">
+          <span class="currency-icon">◉</span>
+          <strong id="menuCoins">0</strong>
+        </div>
 
-        <div>
+        <div class="currency currency-crystals">
+          <span class="currency-icon">◆</span>
+          <strong id="menuCrystals">0</strong>
+        </div>
 
-          <label>
-            TEMPORADA G7
-          </label>
+        <div class="player-level">
+          NIVEL <strong id="menuLevel">1</strong>
+        </div>
+
+      </div>
+
+    </header>
 
 
-          <h1>
-            DOMINA LA
-            <em>
-              ARENA
-            </em>
+    <!-- =======================================================
+         MENÚ PRINCIPAL
+    ======================================================== -->
+
+    <section id="mainMenu" class="screen active">
+
+      <div class="hero-section">
+
+        <div class="hero-content">
+
+          <div class="game-badge">
+            ⚡ G7 ULTIMATE ARENA
+          </div>
+
+          <h1 class="hero-title">
+            SCORVEX
+            <span>G7</span>
           </h1>
 
-
-          <p>
-            Combate, consigue armas,
-            usa habilidades y personaliza
-            tu personaje.
+          <p class="hero-description">
+            Entra a la arena, equipa tu arsenal y supera cada sector.
           </p>
 
 
+          <div class="hero-actions">
+
+            <button
+              id="btnPlay"
+              class="btn btn-primary btn-large"
+              type="button"
+            >
+              ▶ JUGAR
+            </button>
+
+            <button
+              id="btnShop"
+              class="btn btn-secondary"
+              type="button"
+            >
+              🛒 TIENDA
+            </button>
+
+            <button
+              id="btnInventory"
+              class="btn btn-secondary"
+              type="button"
+            >
+              🎒 INVENTARIO
+            </button>
+
+            <button
+              id="btnCustomize"
+              class="btn btn-secondary"
+              type="button"
+            >
+              👤 PERSONALIZAR
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- PANEL DE INFORMACIÓN -->
+
+        <div class="hero-panel">
+
+          <div class="panel-header">
+            <span>SCORVEX SYSTEM</span>
+            <span class="online-status">
+              ● ONLINE
+            </span>
+          </div>
+
+
+          <div class="system-card">
+
+            <div class="system-icon">
+              ⚔
+            </div>
+
+            <div>
+              <strong>ARENA TÁCTICA</strong>
+              <p>
+                Combate contra enemigos y aumenta tu nivel.
+              </p>
+            </div>
+
+          </div>
+
+
+          <div class="system-card">
+
+            <div class="system-icon">
+              🔫
+            </div>
+
+            <div>
+              <strong>ARSENAL</strong>
+              <p>
+                Más de 1000 armas generadas con diferentes rarezas.
+              </p>
+            </div>
+
+          </div>
+
+
+          <div class="system-card">
+
+            <div class="system-icon">
+              ✦
+            </div>
+
+            <div>
+              <strong>HABILIDADES</strong>
+              <p>
+                90 habilidades especiales para personalizar tu estilo.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           ESTADÍSTICAS
+      ====================================================== -->
+
+      <div class="menu-grid">
+
+        <div class="menu-card">
+
+          <span class="menu-card-icon">⚔</span>
+
+          <div>
+            <small>ARMA EQUIPADA</small>
+            <strong id="menuWeapon">
+              -
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div class="menu-card">
+
+          <span class="menu-card-icon">✦</span>
+
+          <div>
+            <small>HABILIDAD</small>
+            <strong id="menuAbility">
+              -
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div class="menu-card">
+
+          <span class="menu-card-icon">🛡</span>
+
+          <div>
+            <small>ARMADURA</small>
+            <strong id="menuArmor">
+              -
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div class="menu-card">
+
+          <span class="menu-card-icon">🏆</span>
+
+          <div>
+            <small>PUNTUACIÓN</small>
+            <strong id="menuScore">
+              0
+            </strong>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           MISIÓN PRINCIPAL
+      ====================================================== -->
+
+      <section class="menu-mission">
+
+        <div class="section-title">
+          <span>🎯</span>
+          MISIÓN ACTUAL
+        </div>
+
+        <div id="menuMission">
+          Cargando misión...
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           MÚSICA
+      ====================================================== -->
+
+      <section class="music-panel">
+
+        <div class="section-title">
+          <span>♫</span>
+          MÚSICA
+        </div>
+
+
+        <div class="music-options">
+
           <button
-            id="play"
-            class="primary"
+            class="music-btn active"
+            data-track="0"
+            type="button"
           >
-            ▶ JUGAR
+            <span>01</span>
+            NEON BATTLE
+          </button>
+
+          <button
+            class="music-btn"
+            data-track="1"
+            type="button"
+          >
+            <span>02</span>
+            DARK ARENA
+          </button>
+
+          <button
+            class="music-btn"
+            data-track="2"
+            type="button"
+          >
+            <span>03</span>
+            FINAL STORM
+          </button>
+
+          <button
+            class="music-btn"
+            data-track="3"
+            type="button"
+          >
+            <span>04</span>
+            CYBER VICTORY
           </button>
 
         </div>
 
 
-        <!-- PERSONAJE -->
+        <div class="music-controls">
 
-        <div class="heroChar">
+          <button
+            id="btnMusic"
+            class="btn btn-small"
+            type="button"
+          >
+            ♫ ACTIVAR MÚSICA
+          </button>
 
-          <i></i>
-
-          <b></b>
-
-          <span></span>
+          <button
+            id="btnSound"
+            class="btn btn-small"
+            type="button"
+          >
+            🔊 SONIDO
+          </button>
 
         </div>
 
-      </div>
-
-
-      <!-- MENÚ PRINCIPAL -->
-
-      <nav>
-
-        <button data-open="shop">
-
-          🔫
-
-          <strong>
-            TIENDA
-          </strong>
-
-          <small>
-            1000 ARMAS
-          </small>
-
-        </button>
-
-
-        <button data-open="inventory">
-
-          🎒
-
-          <strong>
-            INVENTARIO
-          </strong>
-
-          <small>
-            EQUIPAMIENTO
-          </small>
-
-        </button>
-
-
-        <button data-open="character">
-
-          👤
-
-          <strong>
-            PERSONAJE
-          </strong>
-
-          <small>
-            PERSONALIZAR
-          </small>
-
-        </button>
-
-
-        <button data-open="music">
-
-          🎵
-
-          <strong>
-            MÚSICA
-          </strong>
-
-          <small>
-            4 TEMAS
-          </small>
-
-        </button>
-
-
-        <button data-open="missions">
-
-          🎯
-
-          <strong>
-            MISIONES
-          </strong>
-
-          <small>
-            RECOMPENSAS
-          </small>
-
-        </button>
-
-
-        <button data-open="map">
-
-          🗺️
-
-          <strong>
-            MAPA
-          </strong>
-
-          <small>
-            SECTORES
-          </small>
-
-        </button>
-
-      </nav>
-
-
-      <footer>
-
-        ARMAS
-        <b>
-          1000
-        </b>
-
-        &nbsp;
-
-        HABILIDADES
-        <b>
-          90
-        </b>
-
-        &nbsp;
-
-        ARMADURAS
-        <b>
-          6
-        </b>
-
-        &nbsp;
-
-        G7
-
-      </footer>
+      </section>
 
     </section>
 
 
-    <!-- =========================
-         TIENDA
-    ========================== -->
+    <!-- =======================================================
+         PANTALLA DEL JUEGO
+    ======================================================== -->
 
-    <section
-      id="shop"
-      class="screen panel hidden"
-    >
-
-      <header>
-
-        <button
-          class="back"
-          data-back="menu"
-        >
-          ←
-        </button>
+    <section id="gameScreen" class="screen game-screen">
 
 
-        <div>
+      <!-- =====================================================
+           HUD SUPERIOR
+      ====================================================== -->
 
-          <h2>
-            TIENDA DE ARMAS
-          </h2>
+      <div id="gameHUD" class="game-hud">
 
-          <small>
-            1000 armas · monedas virtuales
-          </small>
+
+        <!-- VIDA -->
+
+        <div class="hud-block hud-health">
+
+          <div class="hud-label">
+            <span>HP</span>
+            <strong id="healthText">
+              100 / 100
+            </strong>
+          </div>
+
+          <div class="progress">
+            <div
+              id="healthBar"
+              class="progress-fill health-fill"
+              style="width:100%"
+            ></div>
+          </div>
 
         </div>
 
-      </header>
+
+        <!-- ESCUDO -->
+
+        <div class="hud-block hud-shield">
+
+          <div class="hud-label">
+            <span>ESCUDO</span>
+            <strong id="shieldText">
+              0
+            </strong>
+          </div>
+
+          <div class="progress">
+            <div
+              id="shieldBar"
+              class="progress-fill shield-fill"
+              style="width:0%"
+            ></div>
+          </div>
+
+        </div>
 
 
-      <div class="filters">
+        <!-- NIVEL -->
 
-        <input
-          id="search"
-          placeholder="Buscar arma..."
+        <div class="hud-block hud-level">
+
+          <span>NIVEL</span>
+
+          <strong id="gameLevel">
+            1
+          </strong>
+
+          <div class="progress">
+            <div
+              id="xpBar"
+              class="progress-fill xp-fill"
+              style="width:0%"
+            ></div>
+          </div>
+
+        </div>
+
+
+        <!-- SECTOR -->
+
+        <div class="hud-sector">
+
+          <span>SECTOR</span>
+
+          <strong id="sectorText">
+            1
+          </strong>
+
+        </div>
+
+
+        <!-- WAVE -->
+
+        <div class="hud-wave">
+
+          <span>OLEADA</span>
+
+          <strong id="waveText">
+            1
+          </strong>
+
+        </div>
+
+
+        <!-- PAUSA -->
+
+        <button
+          id="btnPause"
+          class="hud-pause"
+          type="button"
         >
-
-
-        <select id="rarity">
-
-          <option value="all">
-            Todas las rarezas
-          </option>
-
-          <option value="common">
-            Común
-          </option>
-
-          <option value="uncommon">
-            Poco común
-          </option>
-
-          <option value="rare">
-            Raro
-          </option>
-
-          <option value="epic">
-            Épico
-          </option>
-
-          <option value="legendary">
-            Legendario
-          </option>
-
-          <option value="mythic">
-            Mítico
-          </option>
-
-          <option value="ancient">
-            Antiguo
-          </option>
-
-          <option value="omega">
-            Omega
-          </option>
-
-        </select>
-
-
-        <select id="type">
-
-          <option value="all">
-            Todos los tipos
-          </option>
-
-          <option value="rifle">
-            Rifle
-          </option>
-
-          <option value="smg">
-            SMG
-          </option>
-
-          <option value="shotgun">
-            Escopeta
-          </option>
-
-          <option value="sniper">
-            Francotirador
-          </option>
-
-          <option value="pistol">
-            Pistola
-          </option>
-
-          <option value="laser">
-            Láser
-          </option>
-
-          <option value="plasma">
-            Plasma
-          </option>
-
-          <option value="energy">
-            Energía
-          </option>
-
-          <option value="arc">
-            Arco
-          </option>
-
-          <option value="vortex">
-            Vórtice
-          </option>
-
-        </select>
+          II
+        </button>
 
       </div>
 
 
-      <p class="count">
+      <!-- =====================================================
+           LOADOUT
+      ====================================================== -->
 
-        Mostrando
+      <div id="loadoutHUD" class="loadout-hud">
 
-        <b id="count">
-          0
-        </b>
+        <div class="loadout-item">
 
-      </p>
+          <span class="loadout-icon">
+            🔫
+          </span>
+
+          <div>
+            <small>ARMA</small>
+
+            <strong id="hudWeapon">
+              -
+            </strong>
+
+            <span id="hudAmmo">
+              0 / 0
+            </span>
+          </div>
+
+        </div>
+
+
+        <div class="loadout-item">
+
+          <span class="loadout-icon">
+            ✦
+          </span>
+
+          <div>
+            <small>HABILIDAD</small>
+
+            <strong id="hudAbility">
+              -
+            </strong>
+
+            <span id="hudEnergy">
+              ENERGÍA 100
+            </span>
+          </div>
+
+        </div>
+
+
+        <div class="loadout-item">
+
+          <span class="loadout-icon">
+            🛡
+          </span>
+
+          <div>
+            <small>ARMADURA</small>
+
+            <strong id="hudArmor">
+              -
+            </strong>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           MISIÓN / BOSS
+      ====================================================== -->
+
+      <div id="missionHUD" class="mission-hud">
+
+        <div class="mission-title">
+          🎯 MISIÓN
+        </div>
+
+        <div id="gameMission">
+          -
+        </div>
+
+        <div class="mission-progress">
+          <div
+            id="missionProgressBar"
+            class="progress-fill"
+            style="width:0%"
+          ></div>
+        </div>
+
+      </div>
+
+
+      <div
+        id="bossHUD"
+        class="boss-hud hidden"
+      >
+
+        <div class="boss-name">
+          ⚠ JEFE
+        </div>
+
+        <strong id="bossName">
+          -
+        </strong>
+
+        <div class="progress boss-progress">
+
+          <div
+            id="bossHealthBar"
+            class="progress-fill"
+            style="width:100%"
+          ></div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           ARENA
+      ====================================================== -->
+
+      <div id="arenaWrapper" class="arena-wrapper">
+
+        <canvas
+          id="gameCanvas"
+          width="1280"
+          height="720"
+        ></canvas>
+
+
+        <!-- PUNTERO -->
+
+        <div
+          id="crosshair"
+          class="crosshair"
+        >
+          <span></span>
+        </div>
+
+
+        <!-- INDICADOR DE RECARGA -->
+
+        <div
+          id="reloadIndicator"
+          class="reload-indicator hidden"
+        >
+          <span>RECARGANDO</span>
+
+          <div class="progress">
+            <div
+              id="reloadBar"
+              class="progress-fill"
+              style="width:0%"
+            ></div>
+          </div>
+        </div>
+
+
+        <!-- MENSAJE DE OLEADA -->
+
+        <div
+          id="waveAnnouncement"
+          class="wave-announcement hidden"
+        >
+          <span>OLEADA</span>
+          <strong id="waveAnnouncementNumber">
+            1
+          </strong>
+        </div>
+
+
+        <!-- MENSAJE CENTRAL -->
+
+        <div
+          id="arenaMessage"
+          class="arena-message hidden"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           CONTROLES DE ESCRITORIO
+      ====================================================== -->
+
+      <div class="desktop-controls">
+
+        <div class="control-hint">
+          <kbd>W</kbd>
+          <kbd>A</kbd>
+          <kbd>S</kbd>
+          <kbd>D</kbd>
+          <span>MOVER</span>
+        </div>
+
+        <div class="control-hint">
+          <kbd>R</kbd>
+          <span>RECARGAR</span>
+        </div>
+
+        <div class="control-hint">
+          <kbd>Q</kbd>
+          <span>HABILIDAD</span>
+        </div>
+
+        <div class="control-hint">
+          <kbd>ESC</kbd>
+          <span>PAUSA</span>
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           CONTROLES TÁCTILES
+      ====================================================== -->
+
+      <div
+        id="mobileControls"
+        class="mobile-controls"
+      >
+
+        <!-- JOYSTICK -->
+
+        <div
+          id="joystick"
+          class="joystick"
+        >
+
+          <div
+            id="joystickKnob"
+            class="joystick-knob"
+          ></div>
+
+        </div>
+
+
+        <!-- ACCIONES -->
+
+        <div class="mobile-actions">
+
+          <button
+            id="mobileShoot"
+            class="mobile-action shoot-action"
+            type="button"
+          >
+            🔫
+          </button>
+
+          <button
+            id="mobileAbility"
+            class="mobile-action ability-action"
+            type="button"
+          >
+            ✦
+          </button>
+
+          <button
+            id="mobileReload"
+            class="mobile-action reload-action"
+            type="button"
+          >
+            ↻
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           BOTONES INFERIORES
+      ====================================================== -->
+
+      <div class="game-actions">
+
+        <button
+          id="btnUseMedkit"
+          class="game-action"
+          type="button"
+        >
+          ❤️ MEDKIT
+          <span id="medkitCount">
+            0
+          </span>
+        </button>
+
+        <button
+          id="btnUseEnergy"
+          class="game-action"
+          type="button"
+        >
+          ⚡ ENERGÍA
+          <span id="energyKitCount">
+            0
+          </span>
+        </button>
+
+        <button
+          id="btnUseShield"
+          class="game-action"
+          type="button"
+        >
+          🛡 ESCUDO
+          <span id="shieldKitCount">
+            0
+          </span>
+        </button>
+
+        <button
+          id="btnLeaveGame"
+          class="game-action danger"
+          type="button"
+        >
+          ✕ SALIR
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         TIENDA
+    ======================================================== -->
+
+    <section
+      id="shopScreen"
+      class="screen panel-screen"
+    >
+
+      <div class="screen-header">
+
+        <div>
+
+          <span class="screen-kicker">
+            SCORVEX MARKET
+          </span>
+
+          <h2>
+            🛒 TIENDA
+          </h2>
+
+        </div>
+
+
+        <div class="screen-currency">
+
+          <span>
+            ◉ <strong id="shopCoins">0</strong>
+          </span>
+
+          <span>
+            ◆ <strong id="shopCrystals">0</strong>
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- FILTROS -->
+
+      <div class="shop-filters">
+
+        <button
+          class="shop-filter active"
+          data-filter="all"
+          type="button"
+        >
+          TODO
+        </button>
+
+        <button
+          class="shop-filter"
+          data-filter="common"
+          type="button"
+        >
+          COMÚN
+        </button>
+
+        <button
+          class="shop-filter"
+          data-filter="rare"
+          type="button"
+        >
+          RARO
+        </button>
+
+        <button
+          class="shop-filter"
+          data-filter="epic"
+          type="button"
+        >
+          ÉPICO
+        </button>
+
+        <button
+          class="shop-filter"
+          data-filter="legendary"
+          type="button"
+        >
+          LEGENDARIO
+        </button>
+
+        <button
+          class="shop-filter"
+          data-filter="mythic"
+          type="button"
+        >
+          MÍTICO
+        </button>
+
+        <button
+          class="shop-filter"
+          data-filter="ancient"
+          type="button"
+        >
+          ANCESTRAL
+        </button>
+
+        <button
+          class="shop-filter"
+          data-filter="omega"
+          type="button"
+        >
+          OMEGA
+        </button>
+
+      </div>
 
 
       <div
         id="shopGrid"
-        class="grid"
-      ></div>
+        class="item-grid"
+      >
+        <!-- Generado por shop-g7.js -->
+      </div>
+
+
+      <button
+        id="btnBackShop"
+        class="btn btn-secondary back-button"
+        type="button"
+      >
+        ← VOLVER
+      </button>
 
     </section>
 
 
-    <!-- =========================
+    <!-- =======================================================
          INVENTARIO
-    ========================== -->
+    ======================================================== -->
 
     <section
-      id="inventory"
-      class="screen panel hidden"
+      id="inventoryScreen"
+      class="screen panel-screen"
     >
 
-      <header>
+      <div class="screen-header">
+
+        <div>
+
+          <span class="screen-kicker">
+            EQUIPMENT SYSTEM
+          </span>
+
+          <h2>
+            🎒 INVENTARIO
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="inventory-tabs">
 
         <button
-          class="back"
-          data-back="menu"
+          class="inventory-tab active"
+          data-inventory-tab="weapons"
+          type="button"
         >
-          ←
-        </button>
-
-        <h2>
-          INVENTARIO
-        </h2>
-
-      </header>
-
-
-      <div class="tabs">
-
-        <button data-tab="weapons">
           🔫 ARMAS
         </button>
 
-        <button data-tab="abilities">
-          ⚡ HABILIDADES
+        <button
+          class="inventory-tab"
+          data-inventory-tab="armor"
+          type="button"
+        >
+          🛡 ARMADURAS
         </button>
 
-        <button data-tab="armor">
-          🛡️ ARMADURA
-        </button>
-
-        <button data-tab="items">
+        <button
+          class="inventory-tab"
+          data-inventory-tab="items"
+          type="button"
+        >
           🎒 OBJETOS
         </button>
 
@@ -758,523 +1011,370 @@
 
       <div
         id="inventoryGrid"
-        class="grid"
-      ></div>
+        class="item-grid"
+      >
+        <!-- Generado por inventory-g7.js -->
+      </div>
+
+
+      <button
+        id="btnBackInventory"
+        class="btn btn-secondary back-button"
+        type="button"
+      >
+        ← VOLVER
+      </button>
 
     </section>
 
 
-    <!-- =========================
-         PERSONAJE
-    ========================== -->
+    <!-- =======================================================
+         PERSONALIZACIÓN
+    ======================================================== -->
 
     <section
-      id="character"
-      class="screen panel hidden"
+      id="customizeScreen"
+      class="screen panel-screen"
     >
 
-      <header>
+      <div class="screen-header">
 
-        <button
-          class="back"
-          data-back="menu"
-        >
-          ←
-        </button>
+        <div>
 
-        <h2>
-          PERSONALIZAR PERSONAJE
-        </h2>
+          <span class="screen-kicker">
+            CHARACTER SYSTEM
+          </span>
 
-      </header>
+          <h2>
+            👤 PERSONALIZACIÓN
+          </h2>
 
+        </div>
 
-      <div class="custom">
+      </div>
 
 
-        <div class="charPreview">
+      <div class="customize-layout">
 
-          <div class="head"></div>
+        <!-- PERSONAJE -->
 
-          <div class="body"></div>
+        <div class="character-preview-panel">
 
-          <div class="arms"></div>
+          <div
+            id="characterPreview"
+            class="character-preview"
+          >
 
-          <div class="legs"></div>
+            <div
+              id="characterPreviewBody"
+              class="character-preview-body"
+            >
+
+              <div class="character-head"></div>
+
+              <div class="character-body"></div>
+
+              <div class="character-leg left"></div>
+
+              <div class="character-leg right"></div>
+
+            </div>
+
+          </div>
 
 
-          <button id="random">
-
-            🎲 ALEATORIO
-
-          </button>
+          <div
+            id="selectedCharacterName"
+            class="character-name"
+          >
+            SCORVEX
+          </div>
 
         </div>
 
 
-        <div>
+        <!-- OPCIONES -->
 
-          <div class="tabs">
+        <div class="customize-options">
 
-            <button data-custom="outfit">
-              ROPA
+          <div class="customize-tabs">
+
+            <button
+              class="customize-tab active"
+              data-custom-tab="characters"
+              type="button"
+            >
+              PERSONAJES
             </button>
 
-            <button data-custom="head">
-              CABEZA
+            <button
+              class="customize-tab"
+              data-custom-tab="skins"
+              type="button"
+            >
+              ESTILO
             </button>
 
-            <button data-custom="accessories">
-              ACCESORIOS
-            </button>
-
-            <button data-custom="effects">
-              EFECTOS
-            </button>
-
-            <button data-custom="colors">
-              COLORES
+            <button
+              class="customize-tab"
+              data-custom-tab="gear"
+              type="button"
+            >
+              EQUIPO
             </button>
 
           </div>
 
 
           <div
-            id="customGrid"
-            class="grid"
-          ></div>
+            id="customizeGrid"
+            class="customize-grid"
+          >
+            <!-- Generado por characters-g7.js -->
+          </div>
 
         </div>
 
       </div>
-
-    </section>
-
-
-    <!-- =========================
-         MÚSICA
-    ========================== -->
-
-    <section
-      id="music"
-      class="screen panel hidden"
-    >
-
-      <header>
-
-        <button
-          class="back"
-          data-back="menu"
-        >
-          ←
-        </button>
-
-        <h2>
-          4 TIPOS DE MÚSICA
-        </h2>
-
-      </header>
-
-
-      <div
-        id="musicList"
-        class="music"
-      ></div>
 
 
       <button
-        id="musicToggle"
-        class="primary"
+        id="btnBackCustomize"
+        class="btn btn-secondary back-button"
+        type="button"
       >
-        🔇 MÚSICA
+        ← VOLVER
       </button>
 
-
-      <label class="volume">
-
-        Volumen
-
-        <input
-          id="volume"
-          type="range"
-          min="0"
-          max="100"
-          value="45"
-        >
-
-      </label>
-
     </section>
 
-
-    <!-- =========================
-         MISIONES
-    ========================== -->
-
-    <section
-      id="missions"
-      class="screen panel hidden"
-    >
-
-      <header>
-
-        <button
-          class="back"
-          data-back="menu"
-        >
-          ←
-        </button>
-
-        <h2>
-          MISIONES
-        </h2>
-
-      </header>
-
-
-      <div
-        id="missionsList"
-        class="missions"
-      ></div>
-
-    </section>
-
-
-    <!-- =========================
-         MAPA
-    ========================== -->
-
-    <section
-      id="map"
-      class="screen panel hidden"
-    >
-
-      <header>
-
-        <button
-          class="back"
-          data-back="menu"
-        >
-          ←
-        </button>
-
-        <h2>
-          MAPA
-        </h2>
-
-      </header>
-
-
-      <div class="map">
-
-        <button>
-
-          SECTOR 01
-
-          <small>
-            Zona inicial
-          </small>
-
-        </button>
-
-
-        <button>
-
-          SECTOR 02
-
-          <small>
-            Ruinas urbanas
-          </small>
-
-        </button>
-
-
-        <button>
-
-          SECTOR 03
-
-          <small>
-            Zona industrial
-          </small>
-
-        </button>
-
-
-        <button>
-
-          SECTOR 04
-
-          <small>
-            Base avanzada
-          </small>
-
-        </button>
-
-
-        <button disabled>
-
-          SECTOR 05
-
-          <small>
-            🔒 Nivel 10
-          </small>
-
-        </button>
-
-
-        <button disabled>
-
-          SECTOR 06
-
-          <small>
-            🔒 Nivel 15
-          </small>
-
-        </button>
-
-      </div>
-
-    </section>
-
-
-    <!-- =========================
-         JUEGO
-    ========================== -->
-
-    <section
-      id="game"
-      class="screen hidden"
-    >
-
-
-      <!-- HUD -->
-
-      <div class="hud">
-
-
-        <div>
-
-          HP
-
-          <b id="hp">
-            100
-          </b>
-
-          <div class="bar">
-            <i id="hpbar"></i>
-          </div>
-
-        </div>
-
-
-        <div>
-
-          ENERGÍA
-
-          <b id="energy">
-            100
-          </b>
-
-          <div class="bar">
-            <i id="energybar"></i>
-          </div>
-
-        </div>
-
-
-        <div>
-
-          OLEADA
-
-          <b id="wave">
-            1
-          </b>
-
-        </div>
-
-
-        <div>
-
-          PUNTOS
-
-          <b id="score">
-            0
-          </b>
-
-        </div>
-
-
-        <button id="pause">
-
-          Ⅱ
-
-        </button>
-
-      </div>
-
-
-      <!-- CANVAS -->
-
-      <canvas
-        id="canvas"
-        width="1100"
-        height="650"
-      ></canvas>
-
-
-      <!-- ARMA -->
-
-      <div class="weaponHud">
-
-        <span id="weaponIcon">
-          🔫
-        </span>
-
-
-        <b id="weaponName">
-
-          SCORVEX
-
-        </b>
-
-
-        <strong>
-
-          <span id="ammo">
-            30
-          </span>
-
-          /
-
-          <small id="reserve">
-            120
-          </small>
-
-        </strong>
-
-      </div>
-
-
-      <!-- CONTROLES MÓVILES -->
-
-      <div class="touch">
-
-
-        <div class="dpad">
-
-          <button data-key="w">
-            ▲
-          </button>
-
-          <button data-key="a">
-            ◀
-          </button>
-
-          <button data-key="s">
-            ▼
-          </button>
-
-          <button data-key="d">
-            ▶
-          </button>
-
-        </div>
-
-
-        <div>
-
-          <button id="ability">
-            ⚡
-          </button>
-
-          <button id="medkit">
-            🩹
-          </button>
-
-          <button id="reload">
-            🔄
-          </button>
-
-          <button id="fire">
-            🔥
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <!-- BOTONES INFERIORES -->
-
-      <div class="gamebar">
-
-        <button id="gameInventory">
-          🎒
-        </button>
-
-        <button id="gameMusic">
-          🎵
-        </button>
-
-        <button id="exit">
-          🚪
-        </button>
-
-      </div>
-
-    </section>
 
   </main>
 
 
-  <!-- =========================
-       PAUSA
-  ========================== -->
+  <!-- =========================================================
+       MODAL GENERAL
+  ========================================================== -->
 
   <div
-    id="pauseModal"
+    id="modal"
     class="modal hidden"
   >
 
-    <div>
+    <div class="modal-overlay"></div>
 
-      <h2>
-        JUEGO PAUSADO
-      </h2>
-
+    <div class="modal-card">
 
       <button
-        id="resume"
-        class="primary"
+        id="modalClose"
+        class="modal-close"
+        type="button"
       >
-
-        CONTINUAR
-
+        ×
       </button>
 
+      <div
+        id="modalIcon"
+        class="modal-icon"
+      >
+        ⚡
+      </div>
 
-      <button id="quit">
+      <h2 id="modalTitle">
+        SCORVEX
+      </h2>
 
-        SALIR
+      <div id="modalContent">
+        -
+      </div>
 
-      </button>
+      <div
+        id="modalActions"
+        class="modal-actions"
+      ></div>
 
     </div>
 
   </div>
 
 
-  <div id="notes"></div>
+  <!-- =========================================================
+       MODAL DE PAUSA
+  ========================================================== -->
+
+  <div
+    id="pauseModal"
+    class="modal hidden"
+  >
+
+    <div class="modal-overlay"></div>
+
+    <div class="modal-card pause-card">
+
+      <div class="modal-icon">
+        II
+      </div>
+
+      <h2>
+        JUEGO EN PAUSA
+      </h2>
+
+      <p>
+        La arena está detenida.
+      </p>
 
 
-  <!-- IMPORTANTE:
-       weapons-g7.js debe cargarse
-       antes que game.js
-  -->
+      <div class="modal-actions">
+
+        <button
+          id="btnResume"
+          class="btn btn-primary"
+          type="button"
+        >
+          ▶ CONTINUAR
+        </button>
+
+        <button
+          id="btnPauseRestart"
+          class="btn btn-secondary"
+          type="button"
+        >
+          ↻ REINICIAR
+        </button>
+
+        <button
+          id="btnPauseExit"
+          class="btn btn-danger"
+          type="button"
+        >
+          ✕ SALIR
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================================
+       NOTIFICACIONES
+  ========================================================== -->
+
+  <div
+    id="notifications"
+    class="notifications"
+  ></div>
+
+
+  <!-- =========================================================
+       TOOLTIP
+  ========================================================== -->
+
+  <div
+    id="tooltip"
+    class="tooltip hidden"
+  ></div>
+
+
+  <!-- =========================================================
+       SCRIPTS SCORVEX G7
+       
+       IMPORTANTE:
+       Los archivos se cargan en este orden.
+  ========================================================== -->
 
   <script src="weapons-g7.js"></script>
 
+  <script src="abilities-g7.js"></script>
+
+  <script src="characters-g7.js"></script>
+
+  <script src="shop-g7.js"></script>
+
+  <script src="audio-g7.js"></script>
+
+  <script src="enemies-g7.js"></script>
+
+  <script src="missions-g7.js"></script>
+
+  <script src="inventory-g7.js"></script>
+
   <script src="game.js"></script>
+
+
+  <!-- =========================================================
+       ARRANQUE
+  ========================================================== -->
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+      const bootScreen = document.getElementById("bootScreen");
+      const bootBar = document.getElementById("bootBar");
+      const bootText = document.getElementById("bootText");
+      const app = document.getElementById("app");
+
+      let progress = 0;
+
+      const messages = [
+        "INICIANDO SISTEMA...",
+        "CARGANDO ARSENAL...",
+        "CARGANDO HABILIDADES...",
+        "CARGANDO PERSONAJES...",
+        "CARGANDO ARENA...",
+        "SISTEMA LISTO."
+      ];
+
+      const timer = setInterval(() => {
+
+        progress += Math.floor(Math.random() * 15) + 8;
+
+        if (progress > 100) {
+          progress = 100;
+        }
+
+        if (bootBar) {
+          bootBar.style.width = progress + "%";
+        }
+
+        const index = Math.min(
+          Math.floor(progress / 18),
+          messages.length - 1
+        );
+
+        if (bootText) {
+          bootText.textContent = messages[index];
+        }
+
+        if (progress >= 100) {
+
+          clearInterval(timer);
+
+          setTimeout(() => {
+
+            if (bootScreen) {
+              bootScreen.classList.add("hidden");
+            }
+
+            if (app) {
+              app.classList.remove("hidden");
+            }
+
+            if (
+              window.SCORVEX_GAME &&
+              typeof window.SCORVEX_GAME.initialize === "function"
+            ) {
+              window.SCORVEX_GAME.initialize();
+            }
+
+          }, 450);
+        }
+
+      }, 120);
+
+    });
+  </script>
 
 </body>
 </html>
