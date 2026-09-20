@@ -1,472 +1,261 @@
-/* =========================================================
+/* ============================================================
    SCORVEX G7
-   game.js
-   ========================================================= */
+   GAME.JS
+   Motor principal del juego
+============================================================ */
 
 "use strict";
 
-/* =========================================================
-   CONFIGURACIÓN
-========================================================= */
 
-const VERSION = "G7";
+/* ============================================================
+   CONFIGURACIÓN GENERAL
+============================================================ */
+
+const SCORVEX_VERSION = "G7";
+
 const SAVE_KEY = "SCORVEX_G7_SAVE";
 
-const WORLD = {
-  width: 1100,
-  height: 650
+const CANVAS_WIDTH = 1280;
+const CANVAS_HEIGHT = 720;
+
+const DEFAULT_PLAYER_SPEED = 260;
+
+const $ = (id) => document.getElementById(id);
+
+
+/* ============================================================
+   ELEMENTOS
+============================================================ */
+
+const elements = {
+  mainMenu: $("mainMenu"),
+  gameScreen: $("gameScreen"),
+  shopScreen: $("shopScreen"),
+  inventoryScreen: $("inventoryScreen"),
+  customizeScreen: $("customizeScreen"),
+
+  canvas: $("gameCanvas"),
+
+  menuCoins: $("menuCoins"),
+  menuCrystals: $("menuCrystals"),
+  menuLevel: $("menuLevel"),
+  menuWeapon: $("menuWeapon"),
+  menuAbility: $("menuAbility"),
+  menuArmor: $("menuArmor"),
+  menuScore: $("menuScore"),
+  menuMission: $("menuMission"),
+
+  shopCoins: $("shopCoins"),
+  shopCrystals: $("shopCrystals"),
+
+  healthText: $("healthText"),
+  healthBar: $("healthBar"),
+
+  shieldText: $("shieldText"),
+  shieldBar: $("shieldBar"),
+
+  gameLevel: $("gameLevel"),
+  xpBar: $("xpBar"),
+
+  sectorText: $("sectorText"),
+  waveText: $("waveText"),
+
+  hudWeapon: $("hudWeapon"),
+  hudAmmo: $("hudAmmo"),
+  hudAbility: $("hudAbility"),
+  hudEnergy: $("hudEnergy"),
+  hudArmor: $("hudArmor"),
+
+  gameMission: $("gameMission"),
+  missionProgressBar: $("missionProgressBar"),
+
+  bossHUD: $("bossHUD"),
+  bossName: $("bossName"),
+  bossHealthBar: $("bossHealthBar"),
+
+  medkitCount: $("medkitCount"),
+  energyKitCount: $("energyKitCount"),
+  shieldKitCount: $("shieldKitCount"),
+
+  modal: $("modal"),
+  modalIcon: $("modalIcon"),
+  modalTitle: $("modalTitle"),
+  modalContent: $("modalContent"),
+  modalActions: $("modalActions"),
+
+  pauseModal: $("pauseModal"),
+
+  notifications: $("notifications"),
+
+  reloadIndicator: $("reloadIndicator"),
+  reloadBar: $("reloadBar"),
+
+  waveAnnouncement: $("waveAnnouncement"),
+  waveAnnouncementNumber: $("waveAnnouncementNumber"),
+
+  arenaMessage: $("arenaMessage")
 };
 
-const MAX_HP = 100;
-const MAX_ENERGY = 100;
 
+/* ============================================================
+   CANVAS
+============================================================ */
 
-/* =========================================================
-   ARMAS G7
-   weapons-g7.js debe cargarse antes
-========================================================= */
+let ctx = null;
 
-const weapons = window.SCORVEX_WEAPONS || {};
-
-console.assert(
-  Object.keys(weapons).length === 1000,
-  "SCORVEX G7: deben existir exactamente 1000 armas."
-);
-
-
-/* =========================================================
-   DATOS DE RAREZAS
-========================================================= */
-
-const RARITIES = [
-  "common",
-  "uncommon",
-  "rare",
-  "epic",
-  "legendary",
-  "mythic",
-  "ancient",
-  "omega"
-];
-
-const RARITY_NAMES = {
-  common: "Común",
-  uncommon: "Poco común",
-  rare: "Raro",
-  epic: "Épico",
-  legendary: "Legendario",
-  mythic: "Mítico",
-  ancient: "Antiguo",
-  omega: "Omega"
-};
-
-
-/* =========================================================
-   HABILIDADES
-   90 habilidades generadas
-========================================================= */
-
-const abilityNames = [
-  "Pulso",
-  "Escudo",
-  "Impacto",
-  "Ráfaga",
-  "Furia",
-  "Velocidad",
-  "Blindaje",
-  "Cazador",
-  "Tormenta",
-  "Vórtice",
-  "Impulso",
-  "Descarga",
-  "Núcleo",
-  "Reflejo",
-  "Dominio",
-  "Ruptura",
-  "Carga",
-  "Sombra",
-  "Fuego",
-  "Hielo",
-  "Plasma",
-  "Rayo",
-  "Nova",
-  "Titan",
-  "Aegis",
-  "Vector",
-  "Omega",
-  "Spectra",
-  "Phantom",
-  "Inferno"
-];
-
-const abilityTypes = [
-  "Ofensiva",
-  "Defensiva",
-  "Movilidad"
-];
-
-const abilities = {};
-
-for (let i = 0; i < 90; i++) {
-
-  const name =
-    abilityNames[i % abilityNames.length] +
-    " " +
-    String(i + 1).padStart(2, "0");
-
-  const rarity =
-    RARITIES[
-      Math.min(
-        RARITIES.length - 1,
-        Math.floor(i / 12)
-      )
-    ];
-
-  const type =
-    abilityTypes[i % abilityTypes.length];
-
-  abilities["ability_" + String(i + 1).padStart(3, "0")] = {
-
-    id:
-      "ability_" +
-      String(i + 1).padStart(3, "0"),
-
-    name,
-
-    type,
-
-    rarity,
-
-    power:
-      20 + i * 2,
-
-    cooldown:
-      Math.max(2, 12 - Math.floor(i / 10)),
-
-    energy:
-      Math.max(10, 40 - Math.floor(i / 5)),
-
-    icon:
-      type === "Ofensiva"
-        ? "⚡"
-        : type === "Defensiva"
-          ? "🛡️"
-          : "💨"
-
-  };
+if (elements.canvas) {
+  ctx = elements.canvas.getContext("2d");
 }
 
-console.assert(
-  Object.keys(abilities).length === 90,
-  "SCORVEX G7: deben existir exactamente 90 habilidades."
-);
+
+/* ============================================================
+   UTILIDADES
+============================================================ */
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
 
 
-/* =========================================================
-   ARMADURAS
-========================================================= */
+function random(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
-const armors = {
 
-  armor_001: {
-    id: "armor_001",
-    name: "Armadura Scout",
-    rarity: "common",
-    defense: 5,
-    energy: 0,
-    price: 3000,
-    icon: "🦺"
-  },
+function randomInt(min, max) {
+  return Math.floor(random(min, max + 1));
+}
 
-  armor_002: {
-    id: "armor_002",
-    name: "Armadura Táctica",
-    rarity: "uncommon",
-    defense: 10,
-    energy: 5,
-    price: 12000,
-    icon: "🛡️"
-  },
 
-  armor_003: {
-    id: "armor_003",
-    name: "Armadura Guardian",
-    rarity: "rare",
-    defense: 16,
-    energy: 10,
-    price: 45000,
-    icon: "🛡️"
-  },
+function distance(ax, ay, bx, by) {
+  return Math.hypot(bx - ax, by - ay);
+}
 
-  armor_004: {
-    id: "armor_004",
-    name: "Armadura Phantom",
-    rarity: "epic",
-    defense: 23,
-    energy: 15,
-    price: 150000,
-    icon: "⚔️"
-  },
 
-  armor_005: {
-    id: "armor_005",
-    name: "Armadura Titan",
-    rarity: "legendary",
-    defense: 32,
-    energy: 20,
-    price: 650000,
-    icon: "🔰"
-  },
+function formatNumber(number) {
+  return Number(number || 0).toLocaleString("es-PE");
+}
 
-  armor_006: {
-    id: "armor_006",
-    name: "Armadura Omega",
-    rarity: "omega",
-    defense: 45,
-    energy: 30,
-    price: 5000000,
-    icon: "👑"
+
+function deepCopy(object) {
+  if (typeof structuredClone === "function") {
+    return structuredClone(object);
   }
 
-};
+  return JSON.parse(JSON.stringify(object));
+}
 
 
-/* =========================================================
-   PERSONALIZACIÓN
-========================================================= */
-
-const customization = {
-
-  outfit: [
-    ["outfit_1", "Táctico", "🧥", "common"],
-    ["outfit_2", "Comando", "🥋", "uncommon"],
-    ["outfit_3", "Shadow", "🖤", "rare"],
-    ["outfit_4", "Hunter", "🎽", "epic"],
-    ["outfit_5", "Titan", "🛡️", "legendary"],
-    ["outfit_6", "Omega", "⚡", "omega"]
-  ],
-
-  head: [
-    ["head_1", "Casco Scout", "⛑️", "common"],
-    ["head_2", "Casco Táctico", "🪖", "uncommon"],
-    ["head_3", "Visor Shadow", "🥽", "rare"],
-    ["head_4", "Visor Plasma", "🔵", "epic"],
-    ["head_5", "Casco Titan", "👑", "legendary"],
-    ["head_6", "Casco Omega", "💠", "omega"]
-  ],
-
-  accessories: [
-    ["acc_1", "Mochila", "🎒", "common"],
-    ["acc_2", "Comunicador", "📡", "uncommon"],
-    ["acc_3", "Dron", "🤖", "rare"],
-    ["acc_4", "Núcleo", "💎", "epic"],
-    ["acc_5", "Generador", "🔋", "legendary"],
-    ["acc_6", "Núcleo Omega", "☢️", "omega"]
-  ],
-
-  effects: [
-    ["effect_1", "Chispa Azul", "🔵", "rare"],
-    ["effect_2", "Llama", "🔥", "epic"],
-    ["effect_3", "Energía", "⚡", "legendary"],
-    ["effect_4", "Vórtice", "🌀", "mythic"],
-    ["effect_5", "Omega", "💥", "omega"]
-  ],
-
-  colors: [
-    ["blue", "Azul"],
-    ["orange", "Naranja"],
-    ["red", "Rojo"],
-    ["green", "Verde"],
-    ["purple", "Violeta"],
-    ["white", "Blanco"]
-  ]
-
-};
-
-
-/* =========================================================
-   MÚSICA
-========================================================= */
-
-const musicTracks = [
-
-  {
-    id: "arena",
-    name: "Arena",
-    description: "Combate electrónico",
-    bpm: 128
-  },
-
-  {
-    id: "shadow",
-    name: "Shadow",
-    description: "Modo oscuro",
-    bpm: 105
-  },
-
-  {
-    id: "rush",
-    name: "Rush",
-    description: "Alta velocidad",
-    bpm: 150
-  },
-
-  {
-    id: "omega",
-    name: "Omega",
-    description: "Batalla final",
-    bpm: 170
+function safeText(element, value) {
+  if (element) {
+    element.textContent = value;
   }
+}
 
-];
+
+function setWidth(element, percent) {
+  if (element) {
+    element.style.width =
+      `${clamp(percent, 0, 100)}%`;
+  }
+}
 
 
-/* =========================================================
-   GUARDADO
-========================================================= */
+/* ============================================================
+   DATOS PREDETERMINADOS
+============================================================ */
 
-const defaultSave = {
+const DEFAULT_SAVE = {
+  version: SCORVEX_VERSION,
 
-  coins: 5000,
-
-  crystals: 250,
-
-  score: 0,
+  coins: 50000,
+  crystals: 100,
 
   level: 1,
-
   xp: 0,
-
-  hp: MAX_HP,
-
-  energy: MAX_ENERGY,
-
-  medkits: 3,
-
-  ownedWeapons: [
-    "weapon_0001"
-  ],
-
-  equippedWeapon:
-    "weapon_0001",
-
-  ownedAbilities: [
-    "ability_001"
-  ],
-
-  equippedAbility:
-    "ability_001",
-
-  ownedArmors: [
-    "armor_001"
-  ],
-
-  equippedArmor:
-    "armor_001",
-
-  customization: {
-
-    outfit: "outfit_1",
-
-    head: "head_1",
-
-    accessories: "acc_1",
-
-    effects: "effect_1",
-
-    color: "blue"
-
-  },
-
-  music: "arena",
-
-  musicEnabled: true,
-
-  musicVolume: 0.45,
+  score: 0,
 
   sector: 1,
+  wave: 1,
 
-  missions: {
+  weapon: null,
+  ability: "nova",
+  armor: "none",
+  character: "scorvex",
 
-    kills: 0,
+  ownedWeapons: [],
+  ownedAbilities: ["nova"],
+  ownedArmors: ["none"],
+  ownedCharacters: ["scorvex"],
 
-    waves: 0,
+  medkits: 3,
+  energyKits: 2,
+  shieldKits: 1,
+  repairKits: 0,
 
-    coins: 0
+  inventory: [],
 
+  musicEnabled: true,
+  soundEnabled: true,
+
+  selectedTrack: 0,
+
+  stats: {
+    enemiesDefeated: 0,
+    bossesDefeated: 0,
+    shots: 0,
+    hits: 0,
+    gamesPlayed: 0
   }
-
 };
 
 
-function cloneObject(object) {
-
-  return JSON.parse(
-    JSON.stringify(object)
-  );
-
-}
+let saveData = deepCopy(DEFAULT_SAVE);
 
 
-function loadSave() {
+/* ============================================================
+   GUARDADO
+============================================================ */
+
+function loadGame() {
 
   try {
 
-    const raw =
-      localStorage.getItem(SAVE_KEY);
+    const raw = localStorage.getItem(SAVE_KEY);
 
     if (!raw) {
+      saveData = deepCopy(DEFAULT_SAVE);
+    } else {
 
-      return cloneObject(defaultSave);
+      const loaded = JSON.parse(raw);
 
+      saveData = {
+        ...deepCopy(DEFAULT_SAVE),
+        ...loaded,
+
+        stats: {
+          ...deepCopy(DEFAULT_SAVE.stats),
+          ...(loaded.stats || {})
+        }
+      };
     }
-
-    const loaded =
-      JSON.parse(raw);
-
-    return {
-
-      ...cloneObject(defaultSave),
-
-      ...loaded,
-
-      customization: {
-
-        ...cloneObject(
-          defaultSave.customization
-        ),
-
-        ...(loaded.customization || {})
-
-      },
-
-      missions: {
-
-        ...cloneObject(
-          defaultSave.missions
-        ),
-
-        ...(loaded.missions || {})
-
-      }
-
-    };
 
   } catch (error) {
 
     console.warn(
-      "No se pudo cargar la partida.",
+      "[SCORVEX] No se pudo cargar la partida.",
       error
     );
 
-    return cloneObject(defaultSave);
-
+    saveData = deepCopy(DEFAULT_SAVE);
   }
 
+  migrateSave();
+
+  ensureStarterEquipment();
+
+  saveGame();
 }
-
-
-let saveData = loadSave();
 
 
 function saveGame() {
@@ -481,2782 +270,2541 @@ function saveGame() {
   } catch (error) {
 
     console.warn(
-      "No se pudo guardar la partida.",
+      "[SCORVEX] No se pudo guardar.",
       error
     );
-
   }
-
 }
 
 
-/* =========================================================
-   DOM
-========================================================= */
+function resetSave() {
 
-const $ = selector =>
-  document.querySelector(selector);
+  saveData = deepCopy(DEFAULT_SAVE);
 
-const $$ = selector =>
-  [...document.querySelectorAll(selector)];
+  ensureStarterEquipment();
 
+  saveGame();
 
-/* =========================================================
-   ELEMENTOS
-========================================================= */
+  updateAllUI();
 
-const boot =
-  $("#boot");
-
-const app =
-  $("#app");
-
-const menu =
-  $("#menu");
-
-const shop =
-  $("#shop");
-
-const inventory =
-  $("#inventory");
-
-const character =
-  $("#character");
-
-const musicScreen =
-  $("#music");
-
-const missionsScreen =
-  $("#missions");
-
-const mapScreen =
-  $("#map");
-
-const gameScreen =
-  $("#game");
-
-const canvas =
-  $("#canvas");
-
-const ctx =
-  canvas
-    ? canvas.getContext("2d")
-    : null;
+  notify(
+    "Partida reiniciada.",
+    "warning"
+  );
+}
 
 
-/* =========================================================
+/* ============================================================
+   MIGRACIÓN DE VERSIONES ANTIGUAS
+============================================================ */
+
+function migrateSave() {
+
+  if (
+    saveData.weapon === "nova" &&
+    window.SCORVEX_STARTER_WEAPON
+  ) {
+    saveData.weapon =
+      window.SCORVEX_STARTER_WEAPON;
+  }
+
+  if (
+    !Array.isArray(saveData.ownedWeapons)
+  ) {
+    saveData.ownedWeapons = [];
+  }
+
+  if (
+    !Array.isArray(saveData.ownedAbilities)
+  ) {
+    saveData.ownedAbilities = ["nova"];
+  }
+
+  if (
+    !Array.isArray(saveData.ownedArmors)
+  ) {
+    saveData.ownedArmors = ["none"];
+  }
+
+  if (
+    !Array.isArray(saveData.ownedCharacters)
+  ) {
+    saveData.ownedCharacters = ["scorvex"];
+  }
+
+  saveData.version = SCORVEX_VERSION;
+}
+
+
+/* ============================================================
+   SISTEMA DE ARMAS
+============================================================ */
+
+function getWeaponsDatabase() {
+  return window.SCORVEX_WEAPONS || {};
+}
+
+
+function getWeapon(id = saveData.weapon) {
+
+  const database = getWeaponsDatabase();
+
+  if (id && database[id]) {
+    return normalizeWeapon(database[id], id);
+  }
+
+  const firstId =
+    window.SCORVEX_STARTER_WEAPON ||
+    Object.keys(database)[0];
+
+  if (firstId && database[firstId]) {
+    return normalizeWeapon(
+      database[firstId],
+      firstId
+    );
+  }
+
+  return {
+    id: "starter",
+    name: "SCORVEX AR-1",
+    type: "rifle",
+
+    damage: 25,
+    cooldown: 180,
+
+    range: 700,
+
+    magazine: 30,
+    reload: 1500,
+
+    accuracy: 90,
+
+    rarity: "common"
+  };
+}
+
+
+function normalizeWeapon(data, id) {
+
+  const fireRate =
+    Number(data.fireRate || 0);
+
+  let cooldown =
+    Number(data.cooldown || 0);
+
+  if (!cooldown) {
+
+    if (fireRate > 0) {
+
+      if (fireRate <= 30) {
+        cooldown = 1000 / fireRate;
+      } else {
+        cooldown = fireRate;
+      }
+
+    } else {
+      cooldown = 200;
+    }
+  }
+
+  return {
+    ...data,
+
+    id: data.id || id,
+
+    name:
+      data.name ||
+      "Arma SCORVEX",
+
+    damage:
+      Number(data.damage) || 20,
+
+    cooldown,
+
+    range:
+      Number(data.range) || 600,
+
+    magazine:
+      Number(
+        data.magazine ||
+        data.mag ||
+        30
+      ),
+
+    reload:
+      Number(
+        data.reload ||
+        data.reloadTime ||
+        1600
+      ),
+
+    accuracy:
+      Number(data.accuracy) || 85,
+
+    rarity:
+      data.rarity || "common"
+  };
+}
+
+
+function ensureStarterEquipment() {
+
+  const database = getWeaponsDatabase();
+
+  const starterId =
+    window.SCORVEX_STARTER_WEAPON ||
+    Object.keys(database)[0] ||
+    "starter";
+
+  if (
+    !saveData.weapon ||
+    (
+      Object.keys(database).length &&
+      !database[saveData.weapon]
+    )
+  ) {
+    saveData.weapon = starterId;
+  }
+
+  if (
+    !saveData.ownedWeapons.includes(
+      saveData.weapon
+    )
+  ) {
+    saveData.ownedWeapons.unshift(
+      saveData.weapon
+    );
+  }
+
+  const abilities =
+    window.SCORVEX_ABILITIES || {};
+
+  if (
+    abilities &&
+    Object.keys(abilities).length &&
+    !abilities[saveData.ability]
+  ) {
+    saveData.ability =
+      abilities.nova
+        ? "nova"
+        : Object.keys(abilities)[0];
+  }
+
+  if (
+    !saveData.ownedAbilities.includes(
+      saveData.ability
+    )
+  ) {
+    saveData.ownedAbilities.push(
+      saveData.ability
+    );
+  }
+}
+
+
+/* ============================================================
+   HABILIDADES
+============================================================ */
+
+function getAbilitiesDatabase() {
+  return window.SCORVEX_ABILITIES || {};
+}
+
+
+function getAbility(id = saveData.ability) {
+
+  const abilities =
+    getAbilitiesDatabase();
+
+  if (abilities[id]) {
+    return abilities[id];
+  }
+
+  return {
+    id: "nova",
+    name: "Nova Pulse",
+    energy: 30,
+    cooldown: 5000,
+    description:
+      "Pulso de energía que daña a enemigos cercanos."
+  };
+}
+
+
+/* ============================================================
+   ARMADURAS
+============================================================ */
+
+const ARMORS = {
+
+  none: {
+    id: "none",
+    name: "Sin armadura",
+    shield: 0,
+    defense: 0
+  },
+
+  tactical: {
+    id: "tactical",
+    name: "Armadura táctica",
+    shield: 40,
+    defense: 0.1
+  },
+
+  reinforced: {
+    id: "reinforced",
+    name: "Armadura reforzada",
+    shield: 75,
+    defense: 0.17
+  },
+
+  titan: {
+    id: "titan",
+    name: "Armadura Titán",
+    shield: 120,
+    defense: 0.25
+  },
+
+  omega: {
+    id: "omega",
+    name: "Armadura Omega",
+    shield: 180,
+    defense: 0.33
+  }
+};
+
+
+function getArmor() {
+  return (
+    ARMORS[saveData.armor] ||
+    ARMORS.none
+  );
+}
+
+
+/* ============================================================
    ESTADO DEL JUEGO
-========================================================= */
+============================================================ */
 
 let gameRunning = false;
+let paused = false;
+let gameOver = false;
 
-let gamePaused = false;
+let lastFrame = 0;
 
-let animationId = null;
-
-let lastTime = 0;
-
-let gameTime = 0;
-
-let mouseX =
-  WORLD.width / 2;
-
-let mouseY =
-  WORLD.height / 2;
-
-let mouseDown = false;
-
-let wave = 1;
-
-let waveEnemies = 0;
-
-let score = 0;
-
-let combo = 0;
-
-let comboTimer = 0;
-
+let bullets = [];
 let enemies = [];
-
-let projectiles = [];
-
 let particles = [];
-
-let floatingTexts = [];
-
 let pickups = [];
 
-let obstacles = [];
+let currentBoss = null;
 
-let keys = {};
+let enemySpawnTimer = 0;
+let enemySpawnInterval = 1200;
 
-let boss = null;
+let waveEnemiesRemaining = 0;
+let waveEnemiesSpawned = 0;
+let waveEnemiesDefeated = 0;
 
-let spawnTimer = 0;
-
-let fireCooldown = 0;
-
-let abilityCooldown = 0;
-
-let damageFlash = 0;
+let cameraShake = 0;
 
 
-/* =========================================================
+/* ============================================================
    JUGADOR
-========================================================= */
+============================================================ */
 
 const player = {
 
-  x: WORLD.width / 2,
+  x: CANVAS_WIDTH / 2,
+  y: CANVAS_HEIGHT / 2,
 
-  y: WORLD.height / 2,
+  radius: 18,
 
-  radius: 19,
+  speed: DEFAULT_PLAYER_SPEED,
 
-  speed: 230,
+  maxHealth: 100,
+  health: 100,
 
-  hp: MAX_HP,
+  maxEnergy: 100,
+  energy: 100,
 
-  energy: MAX_ENERGY,
+  maxShield: 0,
+  shield: 0,
 
   angle: 0,
 
   ammo: 30,
+  reserveAmmo: 300,
 
-  reserve: 120,
+  shooting: false,
 
-  medkits: 3,
+  lastShot: 0,
 
-  defense: 0,
+  reloading: false,
 
-  color: "#008cff",
+  abilityReady: true,
 
-  alive: true
+  invulnerable: 0,
 
+  dashTimer: 0,
+
+  damageMultiplier: 1,
+
+  fireRateMultiplier: 1
 };
 
 
-/* =========================================================
-   UTILIDADES
-========================================================= */
+/* ============================================================
+   INPUT
+============================================================ */
 
-function clamp(
-  value,
-  min,
-  max
-) {
+const keys = {};
 
-  return Math.max(
-    min,
-    Math.min(max, value)
-  );
+const mouse = {
+  x: CANVAS_WIDTH / 2,
+  y: CANVAS_HEIGHT / 2,
+  down: false
+};
 
-}
 
+window.addEventListener(
+  "keydown",
+  (event) => {
 
-function random(
-  min,
-  max
-) {
+    keys[event.code] = true;
 
-  return Math.random() *
-    (max - min) +
-    min;
-
-}
-
-
-function randomInt(
-  min,
-  max
-) {
-
-  return Math.floor(
-    random(min, max + 1)
-  );
-
-}
-
-
-function distance(
-  a,
-  b
-) {
-
-  return Math.hypot(
-    a.x - b.x,
-    a.y - b.y
-  );
-
-}
-
-
-function getCurrentWeapon() {
-
-  return weapons[
-    saveData.equippedWeapon
-  ] || weapons.weapon_0001;
-
-}
-
-
-function getCurrentAbility() {
-
-  return abilities[
-    saveData.equippedAbility
-  ] || abilities.ability_001;
-
-}
-
-
-function getCurrentArmor() {
-
-  return armors[
-    saveData.equippedArmor
-  ] || armors.armor_001;
-
-}
-
-
-/* =========================================================
-   XP Y NIVELES
-========================================================= */
-
-function xpNeeded(level) {
-
-  return 100 +
-    (level - 1) * 75;
-
-}
-
-
-function addXP(amount) {
-
-  saveData.xp += amount;
-
-  while (
-    saveData.xp >=
-    xpNeeded(saveData.level)
-  ) {
-
-    saveData.xp -=
-      xpNeeded(saveData.level);
-
-    saveData.level++;
-
-    saveData.coins +=
-      1000 + saveData.level * 250;
-
-    saveData.crystals += 10;
-
-    notify(
-      "¡Subiste al nivel " +
-      saveData.level +
-      "!"
-    );
-
-  }
-
-  saveGame();
-
-  updateMenuHUD();
-
-}
-
-
-/* =========================================================
-   MONEDAS
-========================================================= */
-
-function addCoins(amount) {
-
-  saveData.coins +=
-    Math.max(0, Math.floor(amount));
-
-  saveData.missions.coins +=
-    Math.max(0, Math.floor(amount));
-
-  saveGame();
-
-  updateMenuHUD();
-
-}
-
-
-function spendCoins(amount) {
-
-  amount =
-    Math.max(0, Math.floor(amount));
-
-  if (
-    saveData.coins < amount
-  ) {
-
-    notify(
-      "No tienes suficientes monedas."
-    );
-
-    return false;
-
-  }
-
-  saveData.coins -= amount;
-
-  saveGame();
-
-  updateMenuHUD();
-
-  return true;
-
-}
-
-
-/* =========================================================
-   HUD DEL MENÚ
-========================================================= */
-
-function updateMenuHUD() {
-
-  if ($("#coins"))
-    $("#coins").textContent =
-      saveData.coins.toLocaleString();
-
-  if ($("#crystals"))
-    $("#crystals").textContent =
-      saveData.crystals.toLocaleString();
-
-  if ($("#level"))
-    $("#level").textContent =
-      saveData.level;
-
-}
-
-
-/* =========================================================
-   NOTIFICACIONES
-========================================================= */
-
-function notify(message) {
-
-  const container =
-    $("#notes");
-
-  if (!container) return;
-
-  const note =
-    document.createElement("div");
-
-  note.className =
-    "note";
-
-  note.textContent =
-    message;
-
-  container.appendChild(note);
-
-  setTimeout(() => {
-
-    note.remove();
-
-  }, 2600);
-
-}
-
-
-/* =========================================================
-   NAVEGACIÓN
-========================================================= */
-
-function showScreen(id) {
-
-  $$(".screen").forEach(
-    screen => {
-
-      screen.classList.add(
-        "hidden"
-      );
-
-    }
-  );
-
-  const target =
-    document.getElementById(id);
-
-  if (target) {
-
-    target.classList.remove(
-      "hidden"
-    );
-
-  }
-
-}
-
-
-$$("[data-open]").forEach(
-  button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        const id =
-          button.dataset.open;
-
-        showScreen(id);
-
-        if (id === "shop")
-          renderShop();
-
-        if (id === "inventory")
-          renderInventory();
-
-        if (id === "character")
-          renderCustomization();
-
-        if (id === "music")
-          renderMusic();
-
-        if (id === "missions")
-          renderMissions();
-
-      }
-    );
-
-  }
-);
-
-
-$$("[data-back]").forEach(
-  button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        showScreen(
-          button.dataset.back
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* =========================================================
-   TIENDA
-========================================================= */
-
-function renderShop() {
-
-  const grid =
-    $("#shopGrid");
-
-  if (!grid) return;
-
-  const search =
-    (
-      $("#search")?.value ||
-      ""
-    ).toLowerCase();
-
-  const rarity =
-    $("#rarity")?.value ||
-    "all";
-
-  const type =
-    $("#type")?.value ||
-    "all";
-
-  const list =
-    Object.values(weapons)
-      .filter(weapon => {
-
-        if (
-          rarity !== "all" &&
-          weapon.rarity !== rarity
-        ) {
-          return false;
-        }
-
-        if (
-          type !== "all" &&
-          weapon.type !== type
-        ) {
-          return false;
-        }
-
-        return (
-          weapon.name
-            .toLowerCase()
-            .includes(search)
-        );
-
-      });
-
-  $("#count").textContent =
-    list.length.toLocaleString();
-
-  grid.innerHTML = "";
-
-  const fragment =
-    document.createDocumentFragment();
-
-  list.forEach(
-    weapon => {
-
-      const card =
-        document.createElement("article");
-
-      card.className =
-        "card";
-
-      const owned =
-        saveData.ownedWeapons
-          .includes(weapon.id);
-
-      const icon =
-        weapon.icon || "🔫";
-
-      card.innerHTML = `
-
-        <div class="icon">
-          ${icon}
-        </div>
-
-        <h3 class="rarity-${weapon.rarity}">
-          ${escapeHTML(weapon.name)}
-        </h3>
-
-        <small>
-          ${RARITY_NAMES[weapon.rarity] || weapon.rarity}
-          · ${escapeHTML(weapon.type)}
-        </small>
-
-        <div class="stats">
-
-          <div>
-            <small>DAÑO</small>
-            <b>${weapon.damage ?? 0}</b>
-          </div>
-
-          <div>
-            <small>CADENCIA</small>
-            <b>${weapon.fireRate ?? 0}</b>
-          </div>
-
-          <div>
-            <small>PRECISIÓN</small>
-            <b>${weapon.accuracy ?? 0}</b>
-          </div>
-
-        </div>
-
-        <div class="bottom">
-
-          <span class="price">
-            ◈ ${Number(
-              weapon.price || 0
-            ).toLocaleString()}
-          </span>
-
-          <button
-            class="${owned ? "buy owned" : "buy"}"
-            data-buy="${weapon.id}"
-          >
-            ${
-              owned
-                ? "EQUIPAR"
-                : "COMPRAR"
-            }
-          </button>
-
-        </div>
-
-      `;
-
-      fragment.appendChild(card);
-
-    }
-  );
-
-  grid.appendChild(fragment);
-
-  grid
-    .querySelectorAll("[data-buy]")
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          buyOrEquipWeapon(
-            button.dataset.buy
-          );
-
-        }
-      );
-
-    });
-
-}
-
-
-function buyOrEquipWeapon(id) {
-
-  const weapon =
-    weapons[id];
-
-  if (!weapon) {
-
-    notify(
-      "Arma no encontrada."
-    );
-
-    return;
-
-  }
-
-  const owned =
-    saveData.ownedWeapons
-      .includes(id);
-
-  if (!owned) {
-
-    if (
-      !spendCoins(
-        weapon.price
-      )
-    ) {
-
+    if (!gameRunning) {
       return;
-
     }
 
-    saveData.ownedWeapons.push(id);
-
-    notify(
-      "Compraste " +
-      weapon.name
-    );
-
-  }
-
-  saveData.equippedWeapon =
-    id;
-
-  saveGame();
-
-  updateWeaponHUD();
-
-  renderShop();
-
-  notify(
-    "Equipaste " +
-    weapon.name
-  );
-
-}
-
-
-/* =========================================================
-   BUSCADOR DE TIENDA
-========================================================= */
-
-$("#search")?.addEventListener(
-  "input",
-  renderShop
-);
-
-$("#rarity")?.addEventListener(
-  "change",
-  renderShop
-);
-
-$("#type")?.addEventListener(
-  "change",
-  renderShop
-);
-
-
-/* =========================================================
-   INVENTARIO
-========================================================= */
-
-let inventoryTab =
-  "weapons";
-
-
-$$("[data-tab]").forEach(
-  button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        inventoryTab =
-          button.dataset.tab;
-
-        renderInventory();
-
-      }
-    );
-
-  }
-);
-
-
-function renderInventory() {
-
-  const grid =
-    $("#inventoryGrid");
-
-  if (!grid) return;
-
-  grid.innerHTML = "";
-
-  if (
-    inventoryTab ===
-    "weapons"
-  ) {
-
-    saveData.ownedWeapons
-      .forEach(id => {
-
-        const weapon =
-          weapons[id];
-
-        if (!weapon) return;
-
-        grid.appendChild(
-          createInventoryCard(
-            weapon,
-            weapon.id ===
-            saveData.equippedWeapon,
-            () => {
-
-              saveData.equippedWeapon =
-                weapon.id;
-
-              saveGame();
-
-              updateWeaponHUD();
-
-              renderInventory();
-
-              notify(
-                "Arma equipada."
-              );
-
-            }
-          )
-        );
-
-      });
-
-    return;
-  }
-
-
-  if (
-    inventoryTab ===
-    "abilities"
-  ) {
-
-    saveData.ownedAbilities
-      .forEach(id => {
-
-        const ability =
-          abilities[id];
-
-        if (!ability) return;
-
-        grid.appendChild(
-          createInventoryCard(
-            ability,
-            ability.id ===
-            saveData.equippedAbility,
-            () => {
-
-              saveData.equippedAbility =
-                ability.id;
-
-              saveGame();
-
-              renderInventory();
-
-              notify(
-                "Habilidad equipada."
-              );
-
-            }
-          )
-        );
-
-      });
-
-    return;
-  }
-
-
-  if (
-    inventoryTab ===
-    "armor"
-  ) {
-
-    Object.values(armors)
-      .forEach(armor => {
-
-        const owned =
-          saveData.ownedArmors
-            .includes(armor.id);
-
-        if (!owned) return;
-
-        grid.appendChild(
-          createInventoryCard(
-            armor,
-            armor.id ===
-            saveData.equippedArmor,
-            () => {
-
-              saveData.equippedArmor =
-                armor.id;
-
-              saveGame();
-
-              renderInventory();
-
-              notify(
-                "Armadura equipada."
-              );
-
-            }
-          )
-        );
-
-      });
-
-    return;
-  }
-
-
-  if (
-    inventoryTab ===
-    "items"
-  ) {
-
-    const card =
-      document.createElement("article");
-
-    card.className =
-      "card";
-
-    card.innerHTML = `
-
-      <div class="icon">
-        🩹
-      </div>
-
-      <h3>
-        Botiquines
-      </h3>
-
-      <small>
-        Recupera vida durante la batalla.
-      </small>
-
-      <div class="bottom">
-
-        <span class="price">
-          x${saveData.medkits}
-        </span>
-
-        <button
-          class="buy"
-          id="buyMedkit"
-        >
-          COMPRAR
-        </button>
-
-      </div>
-
-    `;
-
-    grid.appendChild(card);
-
-    $("#buyMedkit")
-      ?.addEventListener(
-        "click",
-        buyMedkit
-      );
-
-  }
-
-}
-
-
-function createInventoryCard(
-  item,
-  equipped,
-  action
-) {
-
-  const card =
-    document.createElement("article");
-
-  card.className =
-    "card";
-
-  const icon =
-    item.icon || "🎯";
-
-  card.innerHTML = `
-
-    <div class="icon">
-      ${icon}
-    </div>
-
-    <h3 class="
-      rarity-${
-        item.rarity || "common"
-      }
-    ">
-      ${escapeHTML(item.name)}
-    </h3>
-
-    <small>
-      ${
-        RARITY_NAMES[
-          item.rarity
-        ] ||
-        item.type ||
-        ""
-      }
-    </small>
-
-    <div class="bottom">
-
-      <span class="price">
-        ${
-          equipped
-            ? "EQUIPADO"
-            : ""
-        }
-      </span>
-
-      <button class="equip">
-        ${
-          equipped
-            ? "EQUIPADO"
-            : "EQUIPAR"
-        }
-      </button>
-
-    </div>
-
-  `;
-
-  card
-    .querySelector("button")
-    .addEventListener(
-      "click",
-      action
-    );
-
-  return card;
-
-}
-
-
-/* =========================================================
-   BOTIQUINES
-========================================================= */
-
-function buyMedkit() {
-
-  const price =
-    500;
-
-  if (
-    !spendCoins(price)
-  ) return;
-
-  saveData.medkits++;
-
-  saveGame();
-
-  notify(
-    "Botiquín comprado."
-  );
-
-  renderInventory();
-
-}
-
-
-function useMedkit() {
-
-  if (
-    player.hp >= MAX_HP
-  ) {
-
-    notify(
-      "Tu vida ya está completa."
-    );
-
-    return;
-
-  }
-
-  if (
-    player.medkits <= 0
-  ) {
-
-    notify(
-      "No tienes botiquines."
-    );
-
-    return;
-
-  }
-
-  player.medkits--;
-
-  player.hp =
-    clamp(
-      player.hp + 45,
-      0,
-      MAX_HP
-    );
-
-  saveData.medkits =
-    player.medkits;
-
-  createFloatingText(
-    player.x,
-    player.y - 30,
-    "+45 HP",
-    "#42e58a"
-  );
-
-  saveGame();
-
-}
-
-
-/* =========================================================
-   PERSONALIZACIÓN
-========================================================= */
-
-let customTab =
-  "outfit";
-
-
-$$("[data-custom]").forEach(
-  button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        customTab =
-          button.dataset.custom;
-
-        renderCustomization();
-
-      }
-    );
-
-  }
-);
-
-
-function renderCustomization() {
-
-  const grid =
-    $("#customGrid");
-
-  if (!grid) return;
-
-  grid.innerHTML = "";
-
-  const list =
-    customization[
-      customTab
-    ] || [];
-
-  list.forEach(item => {
-
-    const card =
-      document.createElement("article");
-
-    card.className =
-      "card customization-item";
+    if (event.code === "Escape") {
+      togglePause();
+    }
+
+    if (event.code === "KeyR") {
+      reloadWeapon();
+    }
+
+    if (event.code === "KeyQ") {
+      useAbility();
+    }
 
     if (
-      customTab ===
-      "colors"
+      event.code === "Space"
     ) {
-
-      const [
-        id,
-        name
-      ] = item;
-
-      card.innerHTML = `
-
-        <div class="icon">
-          🎨
-        </div>
-
-        <h3>
-          ${escapeHTML(name)}
-        </h3>
-
-        <button
-          class="equip"
-          data-custom-id="${id}"
-        >
-          USAR
-        </button>
-
-      `;
-
-    } else {
-
-      const [
-        id,
-        name,
-        icon,
-        rarity
-      ] = item;
-
-      card.innerHTML = `
-
-        <div class="icon">
-          ${icon}
-        </div>
-
-        <h3 class="rarity-${rarity}">
-          ${escapeHTML(name)}
-        </h3>
-
-        <small>
-          ${
-            RARITY_NAMES[rarity]
-          }
-        </small>
-
-        <button
-          class="equip"
-          data-custom-id="${id}"
-        >
-          ${
-            saveData.customization[
-              customTab
-            ] === id
-              ? "EQUIPADO"
-              : "USAR"
-          }
-        </button>
-
-      `;
-
+      event.preventDefault();
+      player.shooting = true;
     }
-
-    grid.appendChild(card);
-
-  });
-
-
-  grid
-    .querySelectorAll(
-      "[data-custom-id]"
-    )
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          saveData.customization[
-            customTab
-          ] =
-            button.dataset.customId;
-
-          saveGame();
-
-          updateCharacterPreview();
-
-          renderCustomization();
-
-          notify(
-            "Personalización aplicada."
-          );
-
-        }
-      );
-
-    });
-
-}
-
-
-function updateCharacterPreview() {
-
-  const colorMap = {
-
-    blue: "#008cff",
-
-    orange: "#ff5b00",
-
-    red: "#ff304f",
-
-    green: "#35db83",
-
-    purple: "#9b5cff",
-
-    white: "#e9f4ff"
-
-  };
-
-  player.color =
-    colorMap[
-      saveData.customization.color
-    ] || "#008cff";
-
-  const preview =
-    $(".charPreview");
-
-  if (!preview) return;
-
-  preview.style.setProperty(
-    "--player-color",
-    player.color
-  );
-
-}
-
-
-$("#random")?.addEventListener(
-  "click",
-  () => {
-
-    const categories = [
-      "outfit",
-      "head",
-      "accessories",
-      "effects",
-      "colors"
-    ];
-
-    categories.forEach(
-      category => {
-
-        const list =
-          customization[category];
-
-        if (!list?.length)
-          return;
-
-        const item =
-          list[
-            randomInt(
-              0,
-              list.length - 1
-            )
-          ];
-
-        saveData.customization[
-          category
-        ] =
-          item[0];
-
-      }
-    );
-
-    saveGame();
-
-    updateCharacterPreview();
-
-    renderCustomization();
-
-    notify(
-      "Personaje aleatorio creado."
-    );
-
   }
 );
 
 
-/* =========================================================
-   MÚSICA
-========================================================= */
+window.addEventListener(
+  "keyup",
+  (event) => {
 
-let audioContext = null;
+    keys[event.code] = false;
 
-let musicTimer = null;
-
-let musicStep = 0;
-
-
-function getAudioContext() {
-
-  if (!audioContext) {
-
-    const AudioCtx =
-      window.AudioContext ||
-      window.webkitAudioContext;
-
-    if (!AudioCtx)
-      return null;
-
-    audioContext =
-      new AudioCtx();
-
+    if (event.code === "Space") {
+      player.shooting = false;
+    }
   }
-
-  return audioContext;
-
-}
+);
 
 
-function playTone(
-  frequency,
-  duration,
-  volume = 0.05,
-  type = "sine"
-) {
+if (elements.canvas) {
 
-  const audio =
-    getAudioContext();
-
-  if (!audio) return;
-
-  const oscillator =
-    audio.createOscillator();
-
-  const gain =
-    audio.createGain();
-
-  oscillator.type =
-    type;
-
-  oscillator.frequency.value =
-    frequency;
-
-  gain.gain.setValueAtTime(
-    0,
-    audio.currentTime
+  elements.canvas.addEventListener(
+    "mousemove",
+    updateMousePosition
   );
 
-  gain.gain.linearRampToValueAtTime(
-    volume *
-    saveData.musicVolume,
-    audio.currentTime + .01
-  );
+  elements.canvas.addEventListener(
+    "mousedown",
+    (event) => {
 
-  gain.gain.exponentialRampToValueAtTime(
-    0.001,
-    audio.currentTime + duration
-  );
-
-  oscillator.connect(gain);
-
-  gain.connect(
-    audio.destination
-  );
-
-  oscillator.start();
-
-  oscillator.stop(
-    audio.currentTime +
-    duration
-  );
-
-}
-
-
-function startMusic() {
-
-  stopMusic();
-
-  if (
-    !saveData.musicEnabled
-  ) return;
-
-  const track =
-    musicTracks.find(
-      item =>
-        item.id ===
-        saveData.music
-    ) ||
-    musicTracks[0];
-
-  const interval =
-    60000 /
-    track.bpm;
-
-  musicStep = 0;
-
-  musicTimer =
-    setInterval(
-      () => {
-
-        if (
-          !saveData.musicEnabled ||
-          gamePaused
-        ) return;
-
-        const notes = {
-
-          arena: [
-            110,
-            164.81,
-            220,
-            164.81
-          ],
-
-          shadow: [
-            82.41,
-            123.47,
-            146.83,
-            123.47
-          ],
-
-          rush: [
-            146.83,
-            220,
-            293.66,
-            220
-          ],
-
-          omega: [
-            73.42,
-            110,
-            146.83,
-            220
-          ]
-
-        };
-
-        const sequence =
-          notes[
-            track.id
-          ] || notes.arena;
-
-        const note =
-          sequence[
-            musicStep %
-            sequence.length
-          ];
-
-        playTone(
-          note,
-          .18,
-          .035,
-          "sawtooth"
-        );
-
-        musicStep++;
-
-      },
-      interval
-    );
-
-}
-
-
-function stopMusic() {
-
-  if (musicTimer) {
-
-    clearInterval(
-      musicTimer
-    );
-
-    musicTimer = null;
-
-  }
-
-}
-
-
-function renderMusic() {
-
-  const list =
-    $("#musicList");
-
-  if (!list) return;
-
-  list.innerHTML = "";
-
-  musicTracks.forEach(
-    track => {
-
-      const button =
-        document.createElement(
-          "button"
-        );
-
-      button.innerHTML = `
-
-        <b>
-          🎵 ${track.name}
-        </b>
-
-        <small>
-          ${track.description}
-          · ${track.bpm} BPM
-        </small>
-
-      `;
-
-      if (
-        saveData.music ===
-        track.id
-      ) {
-
-        button.style.borderColor =
-          "var(--blue)";
-
+      if (event.button === 0) {
+        mouse.down = true;
+        player.shooting = true;
       }
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          saveData.music =
-            track.id;
-
-          saveGame();
-
-          startMusic();
-
-          renderMusic();
-
-          notify(
-            "Música seleccionada: " +
-            track.name
-          );
-
-        }
-      );
-
-      list.appendChild(
-        button
-      );
-
     }
   );
 
-}
-
-
-$("#musicToggle")
-  ?.addEventListener(
-    "click",
+  window.addEventListener(
+    "mouseup",
     () => {
 
-      saveData.musicEnabled =
-        !saveData.musicEnabled;
-
-      saveGame();
-
-      if (
-        saveData.musicEnabled
-      ) {
-
-        startMusic();
-
-      } else {
-
-        stopMusic();
-
-      }
-
-      $("#musicToggle")
-        .textContent =
-          saveData.musicEnabled
-            ? "🔊 MÚSICA"
-            : "🔇 MÚSICA";
-
+      mouse.down = false;
+      player.shooting = false;
     }
   );
 
-
-$("#volume")
-  ?.addEventListener(
-    "input",
-    event => {
-
-      saveData.musicVolume =
-        Number(
-          event.target.value
-        ) / 100;
-
-      saveGame();
-
+  elements.canvas.addEventListener(
+    "contextmenu",
+    (event) => {
+      event.preventDefault();
     }
   );
-
-
-/* =========================================================
-   MISIONES
-========================================================= */
-
-function renderMissions() {
-
-  const list =
-    $("#missionsList");
-
-  if (!list) return;
-
-  const missions = [
-
-    {
-      name: "Primer combate",
-      description:
-        "Elimina 10 enemigos.",
-      current:
-        saveData.missions.kills,
-      target: 10,
-      reward: 1500
-    },
-
-    {
-      name: "Superviviente",
-      description:
-        "Completa 5 oleadas.",
-      current:
-        saveData.missions.waves,
-      target: 5,
-      reward: 5000
-    },
-
-    {
-      name: "Cazador G7",
-      description:
-        "Elimina 50 enemigos.",
-      current:
-        saveData.missions.kills,
-      target: 50,
-      reward: 15000
-    },
-
-    {
-      name: "Dominio de la arena",
-      description:
-        "Completa 15 oleadas.",
-      current:
-        saveData.missions.waves,
-      target: 15,
-      reward: 50000
-    }
-
-  ];
-
-  list.innerHTML = "";
-
-  missions.forEach(
-    mission => {
-
-      const progress =
-        clamp(
-          mission.current /
-          mission.target *
-          100,
-          0,
-          100
-        );
-
-      const card =
-        document.createElement(
-          "article"
-        );
-
-      card.className =
-        "mission";
-
-      card.innerHTML = `
-
-        <h3>
-          ${mission.name}
-        </h3>
-
-        <p>
-          ${mission.description}
-        </p>
-
-        <small>
-          ${Math.min(
-            mission.current,
-            mission.target
-          )}
-          /
-          ${mission.target}
-          · Recompensa:
-          ${mission.reward.toLocaleString()}
-          monedas
-        </small>
-
-        <div class="bar">
-          <i
-            style="
-              display:block;
-              width:${progress}%;
-              height:100%;
-              background:var(--blue);
-            "
-          ></i>
-        </div>
-
-      `;
-
-      list.appendChild(card);
-
-    }
-  );
-
 }
 
 
-/* =========================================================
-   CREACIÓN DE ENEMIGOS
-========================================================= */
+function updateMousePosition(event) {
 
-function createEnemy(
-  type = "normal"
-) {
-
-  const side =
-    randomInt(0, 3);
-
-  let x;
-  let y;
-
-  if (side === 0) {
-
-    x = random(30, WORLD.width - 30);
-    y = 25;
-
-  } else if (side === 1) {
-
-    x = WORLD.width - 25;
-    y = random(30, WORLD.height - 30);
-
-  } else if (side === 2) {
-
-    x = random(30, WORLD.width - 30);
-    y = WORLD.height - 25;
-
-  } else {
-
-    x = 25;
-    y = random(30, WORLD.height - 30);
-
+  if (!elements.canvas) {
+    return;
   }
 
-  const scale =
-    1 + wave * 0.055;
+  const rect =
+    elements.canvas.getBoundingClientRect();
 
-  const bossEnemy =
-    type === "boss";
+  mouse.x =
+    (
+      (event.clientX - rect.left) /
+      rect.width
+    ) * CANVAS_WIDTH;
 
-  const enemy = {
-
-    x,
-
-    y,
-
-    radius:
-      bossEnemy ? 34 : 17,
-
-    speed:
-      bossEnemy
-        ? 50 + wave * 2
-        : 70 + wave * 4,
-
-    hp:
-      bossEnemy
-        ? 900 + wave * 150
-        : 65 + wave * 22,
-
-    maxHp:
-      bossEnemy
-        ? 900 + wave * 150
-        : 65 + wave * 22,
-
-    damage:
-      bossEnemy
-        ? 18 + wave
-        : 7 + wave * .7,
-
-    type,
-
-    color:
-      bossEnemy
-        ? "#ff4c20"
-        : type === "fast"
-          ? "#ffbf30"
-          : "#e94c62",
-
-    attackCooldown:
-      random(.2, 1),
-
-    shootCooldown:
-      random(1, 3),
-
-    hitFlash: 0
-
-  };
-
-  return enemy;
-
+  mouse.y =
+    (
+      (event.clientY - rect.top) /
+      rect.height
+    ) * CANVAS_HEIGHT;
 }
 
 
-/* =========================================================
-   GENERAR OLEADA
-========================================================= */
+/* ============================================================
+   INICIAR JUEGO
+============================================================ */
 
-function spawnWave() {
+function startGame() {
 
+  showScreen("gameScreen");
+
+  gameRunning = true;
+  paused = false;
+  gameOver = false;
+
+  saveData.stats.gamesPlayed++;
+
+  const armor = getArmor();
+
+  player.x = CANVAS_WIDTH / 2;
+  player.y = CANVAS_HEIGHT / 2;
+
+  player.health = player.maxHealth;
+
+  player.energy = player.maxEnergy;
+
+  player.maxShield = armor.shield;
+  player.shield = armor.shield;
+
+  player.invulnerable = 1000;
+
+  player.damageMultiplier = 1;
+  player.fireRateMultiplier = 1;
+
+  const weapon = getWeapon();
+
+  player.ammo = weapon.magazine;
+
+  player.reserveAmmo =
+    weapon.magazine * 10;
+
+  player.reloading = false;
+
+  player.abilityReady = true;
+
+  bullets = [];
   enemies = [];
+  particles = [];
+  pickups = [];
 
-  projectiles = [];
+  currentBoss = null;
 
-  waveEnemies =
-    5 +
-    wave * 2;
+  saveData.wave =
+    Math.max(1, saveData.wave || 1);
 
-  for (
-    let i = 0;
-    i < waveEnemies;
-    i++
-  ) {
+  saveData.sector =
+    Math.max(1, saveData.sector || 1);
 
-    let type =
-      "normal";
+  startWave();
 
-    if (
-      wave >= 3 &&
-      i % 5 === 0
-    ) {
+  saveGame();
 
-      type = "fast";
-
-    }
-
-    enemies.push(
-      createEnemy(type)
-    );
-
-  }
-
-  if (
-    wave >= 5 &&
-    wave % 5 === 0
-  ) {
-
-    boss =
-      createEnemy("boss");
-
-    enemies.push(boss);
-
-    notify(
-      "⚠ JEFE DE OLEADA"
-    );
-
-  } else {
-
-    boss = null;
-
-  }
+  updateAllUI();
 
   notify(
-    "OLEADA " +
-    wave
+    `Sector ${saveData.sector} iniciado`,
+    "success"
   );
 
+  callAudio("playGameMusic");
+
+  lastFrame = performance.now();
+
+  requestAnimationFrame(gameLoop);
 }
 
 
-/* =========================================================
-   PROYECTILES
-========================================================= */
+/* ============================================================
+   LOOP
+============================================================ */
 
-function createProjectile(
-  x,
-  y,
-  angle,
-  speed,
-  damage,
-  owner = "player",
-  color = "#00baff"
-) {
+function gameLoop(timestamp) {
 
-  projectiles.push({
-
-    x,
-
-    y,
-
-    vx:
-      Math.cos(angle) *
-      speed,
-
-    vy:
-      Math.sin(angle) *
-      speed,
-
-    radius:
-      owner === "player"
-        ? 5
-        : 6,
-
-    damage,
-
-    owner,
-
-    color,
-
-    life: 2
-
-  });
-
-}
-
-
-/* =========================================================
-   DISPARAR
-========================================================= */
-
-function fireWeapon() {
-
-  if (!gameRunning)
+  if (!gameRunning) {
     return;
-
-  if (gamePaused)
-    return;
-
-  if (
-    fireCooldown > 0
-  )
-    return;
-
-  const weapon =
-    getCurrentWeapon();
-
-  if (!weapon)
-    return;
-
-  if (
-    player.ammo <= 0
-  ) {
-
-    reloadWeapon();
-
-    return;
-
   }
 
-  const angle =
-    Math.atan2(
-      mouseY - player.y,
-      mouseX - player.x
-    );
-
-  const damage =
-    Number(
-      weapon.damage || 20
-    );
-
-  const speed =
-    620 +
-    Number(
-      weapon.projectileSpeed || 0
-    );
-
-  const spread =
-    Number(
-      weapon.spread || 0
-    ) *
-    Math.PI /
-    180;
-
-  const bullets =
-    Number(
-      weapon.pellets ||
-      weapon.shots ||
-      1
-    );
-
-  for (
-    let i = 0;
-    i < bullets;
-    i++
-  ) {
-
-    const randomSpread =
-      bullets > 1
-        ? random(
-            -spread,
-            spread
-          )
-        : random(
-            -spread * .25,
-            spread * .25
-          );
-
-    createProjectile(
-      player.x,
-      player.y,
-      angle + randomSpread,
-      speed,
-      damage,
-      "player",
-      player.color
-    );
-
-  }
-
-  player.ammo--;
-
-  fireCooldown =
-    Math.max(
-      .04,
-      Number(
-        weapon.fireDelay ||
-        weapon.fireRate ||
-        .15
-      ) / 100
-    );
-
-  playShotSound();
-
-}
-
-
-/* =========================================================
-   RECARGAR
-========================================================= */
-
-function reloadWeapon() {
-
-  const missing =
-    30 -
-    player.ammo;
-
-  if (
-    missing <= 0
-  ) return;
-
-  if (
-    player.reserve <= 0
-  ) {
-
-    notify(
-      "Sin munición."
-    );
-
-    return;
-
-  }
-
-  const amount =
+  const delta =
     Math.min(
-      missing,
-      player.reserve
+      (timestamp - lastFrame) / 1000,
+      0.05
     );
 
-  player.ammo += amount;
+  lastFrame = timestamp;
 
-  player.reserve -= amount;
+  if (!paused && !gameOver) {
 
-  playTone(
-    260,
-    .12,
-    .04,
-    "square"
-  );
+    updateGame(delta, timestamp);
 
+    renderGame();
+  }
+
+  requestAnimationFrame(gameLoop);
 }
 
 
-/* =========================================================
-   HABILIDAD
-========================================================= */
+/* ============================================================
+   UPDATE
+============================================================ */
 
-function useAbility() {
+function updateGame(delta, timestamp) {
 
-  if (!gameRunning)
-    return;
+  updatePlayer(delta);
 
-  if (
-    abilityCooldown > 0
-  )
-    return;
+  updateShooting(timestamp);
 
-  const ability =
-    getCurrentAbility();
+  updateBullets(delta);
 
-  if (!ability)
-    return;
+  updateEnemies(delta);
 
-  if (
-    player.energy <
-    ability.energy
-  ) {
+  updateParticles(delta);
 
-    notify(
-      "No tienes suficiente energía."
-    );
+  updatePickups(delta);
 
-    return;
+  updateEnemySpawner(delta);
 
+  regenerateEnergy(delta);
+
+  if (player.invulnerable > 0) {
+    player.invulnerable -= delta * 1000;
   }
 
-  player.energy -=
-    ability.energy;
-
-  abilityCooldown =
-    ability.cooldown;
-
-  if (
-    ability.type ===
-    "Ofensiva"
-  ) {
-
-    const radius =
-      130;
-
-    enemies.forEach(
-      enemy => {
-
-        const d =
-          distance(
-            player,
-            enemy
-          );
-
-        if (d <= radius) {
-
-          enemy.hp -=
-            ability.power;
-
-          enemy.hitFlash =
-            .15;
-
-          createExplosion(
-            enemy.x,
-            enemy.y,
-            "#00baff"
-          );
-
-        }
-
-      }
-    );
-
-    createExplosion(
-      player.x,
-      player.y,
-      "#00baff"
-    );
-
+  if (cameraShake > 0) {
+    cameraShake -= delta * 25;
   }
 
+  checkWaveCompletion();
 
-  if (
-    ability.type ===
-    "Defensiva"
-  ) {
-
-    player.hp =
-      clamp(
-        player.hp +
-        ability.power * .7,
-        0,
-        MAX_HP
-      );
-
-    player.defense =
-      20;
-
-    setTimeout(
-      () => {
-        player.defense = 0;
-      },
-      3000
-    );
-
-    createFloatingText(
-      player.x,
-      player.y - 35,
-      "ESCUDO",
-      "#58c7ff"
-    );
-
-  }
-
-
-  if (
-    ability.type ===
-    "Movilidad"
-  ) {
-
-    const angle =
-      Math.atan2(
-        mouseY - player.y,
-        mouseX - player.x
-      );
-
-    player.x +=
-      Math.cos(angle) *
-      140;
-
-    player.y +=
-      Math.sin(angle) *
-      140;
-
-    player.x =
-      clamp(
-        player.x,
-        25,
-        WORLD.width - 25
-      );
-
-    player.y =
-      clamp(
-        player.y,
-        25,
-        WORLD.height - 25
-      );
-
-    createExplosion(
-      player.x,
-      player.y,
-      "#8b5cff"
-    );
-
-  }
-
-  playAbilitySound();
-
+  updateHUD();
 }
 
 
-/* =========================================================
-   DAÑO AL JUGADOR
-========================================================= */
+/* ============================================================
+   MOVIMIENTO
+============================================================ */
 
-function damagePlayer(
-  amount
-) {
+function updatePlayer(delta) {
 
-  const reduction =
-    player.defense;
-
-  const armor =
-    getCurrentArmor();
-
-  const armorDefense =
-    armor?.defense || 0;
-
-  const finalDamage =
-    Math.max(
-      1,
-      amount -
-      armorDefense * .25 -
-      reduction
-    );
-
-  player.hp -=
-    finalDamage;
-
-  damageFlash =
-    .18;
-
-  createFloatingText(
-    player.x,
-    player.y - 25,
-    "-" +
-    Math.round(finalDamage),
-    "#ff5368"
-  );
+  let moveX = 0;
+  let moveY = 0;
 
   if (
-    player.hp <= 0
-  ) {
-
-    player.hp = 0;
-
-    player.alive = false;
-
-    endGame();
-
-  }
-
-}
-
-
-/* =========================================================
-   ACTUALIZAR JUGADOR
-========================================================= */
-
-function updatePlayer(dt) {
-
-  let dx = 0;
-  let dy = 0;
-
-  if (
-    keys.w ||
+    keys.KeyW ||
     keys.ArrowUp
-  )
-    dy--;
-
-  if (
-    keys.s ||
-    keys.ArrowDown
-  )
-    dy++;
-
-  if (
-    keys.a ||
-    keys.ArrowLeft
-  )
-    dx--;
-
-  if (
-    keys.d ||
-    keys.ArrowRight
-  )
-    dx++;
-
-  if (
-    dx !== 0 ||
-    dy !== 0
   ) {
-
-    const length =
-      Math.hypot(
-        dx,
-        dy
-      );
-
-    dx /= length;
-    dy /= length;
-
-    player.x +=
-      dx *
-      player.speed *
-      dt;
-
-    player.y +=
-      dy *
-      player.speed *
-      dt;
-
+    moveY -= 1;
   }
+
+  if (
+    keys.KeyS ||
+    keys.ArrowDown
+  ) {
+    moveY += 1;
+  }
+
+  if (
+    keys.KeyA ||
+    keys.ArrowLeft
+  ) {
+    moveX -= 1;
+  }
+
+  if (
+    keys.KeyD ||
+    keys.ArrowRight
+  ) {
+    moveX += 1;
+  }
+
+  const magnitude =
+    Math.hypot(moveX, moveY);
+
+  if (magnitude > 0) {
+
+    moveX /= magnitude;
+    moveY /= magnitude;
+  }
+
+  let speed =
+    player.speed;
+
+  if (player.dashTimer > 0) {
+
+    speed *= 2.4;
+
+    player.dashTimer -=
+      delta * 1000;
+  }
+
+  player.x +=
+    moveX *
+    speed *
+    delta;
+
+  player.y +=
+    moveY *
+    speed *
+    delta;
 
   player.x =
     clamp(
       player.x,
-      25,
-      WORLD.width - 25
+      player.radius,
+      CANVAS_WIDTH -
+      player.radius
     );
 
   player.y =
     clamp(
       player.y,
-      25,
-      WORLD.height - 25
+      player.radius,
+      CANVAS_HEIGHT -
+      player.radius
     );
 
   player.angle =
     Math.atan2(
-      mouseY - player.y,
-      mouseX - player.x
+      mouse.y - player.y,
+      mouse.x - player.x
+    );
+}
+
+
+/* ============================================================
+   DISPARO
+============================================================ */
+
+function updateShooting(timestamp) {
+
+  if (!player.shooting) {
+    return;
+  }
+
+  shoot(timestamp);
+}
+
+
+function shoot(timestamp = performance.now()) {
+
+  if (
+    !gameRunning ||
+    paused ||
+    gameOver ||
+    player.reloading
+  ) {
+    return;
+  }
+
+  const weapon = getWeapon();
+
+  const cooldown =
+    weapon.cooldown /
+    player.fireRateMultiplier;
+
+  if (
+    timestamp -
+    player.lastShot <
+    cooldown
+  ) {
+    return;
+  }
+
+  if (player.ammo <= 0) {
+
+    reloadWeapon();
+
+    return;
+  }
+
+  player.lastShot = timestamp;
+
+  player.ammo--;
+
+  saveData.stats.shots++;
+
+  const accuracy =
+    clamp(
+      weapon.accuracy,
+      5,
+      100
     );
 
+  const spread =
+    (
+      (100 - accuracy) /
+      100
+    ) * 0.22;
+
+  const angle =
+    player.angle +
+    random(
+      -spread,
+      spread
+    );
+
+  const speed =
+    weapon.type === "sniper"
+      ? 1250
+      : 900;
+
+  bullets.push({
+    x:
+      player.x +
+      Math.cos(angle) * 24,
+
+    y:
+      player.y +
+      Math.sin(angle) * 24,
+
+    vx:
+      Math.cos(angle) * speed,
+
+    vy:
+      Math.sin(angle) * speed,
+
+    radius:
+      weapon.type === "plasma"
+        ? 6
+        : 3,
+
+    damage:
+      weapon.damage *
+      player.damageMultiplier,
+
+    range:
+      weapon.range,
+
+    traveled: 0,
+
+    color:
+      getRarityColor(
+        weapon.rarity
+      )
+  });
+
+  createMuzzleParticles();
+
+  callAudio("shoot");
+
+  updateHUD();
 }
 
 
-/* =========================================================
-   ACTUALIZAR ENEMIGOS
-========================================================= */
+/* ============================================================
+   RECARGA
+============================================================ */
 
-function updateEnemies(dt) {
+function reloadWeapon() {
 
-  enemies.forEach(
-    enemy => {
+  if (
+    player.reloading ||
+    player.reserveAmmo <= 0
+  ) {
+    return;
+  }
 
-      if (
-        enemy.hp <= 0
-      )
-        return;
+  const weapon = getWeapon();
 
-      const angle =
-        Math.atan2(
-          player.y - enemy.y,
-          player.x - enemy.x
-        );
+  if (
+    player.ammo >=
+    weapon.magazine
+  ) {
+    return;
+  }
 
-      const d =
-        distance(
-          enemy,
-          player
-        );
+  player.reloading = true;
 
-      if (
-        d > 75
-      ) {
+  if (elements.reloadIndicator) {
+    elements.reloadIndicator.classList.remove(
+      "hidden"
+    );
+  }
 
-        enemy.x +=
-          Math.cos(angle) *
-          enemy.speed *
-          dt;
+  let elapsed = 0;
 
-        enemy.y +=
-          Math.sin(angle) *
-          enemy.speed *
-          dt;
+  const duration =
+    weapon.reload;
 
-      } else {
-
-        enemy.attackCooldown -=
-          dt;
+  const interval =
+    setInterval(
+      () => {
 
         if (
-          enemy.attackCooldown <= 0
+          !gameRunning
         ) {
-
-          damagePlayer(
-            enemy.damage
-          );
-
-          enemy.attackCooldown =
-            .8;
-
+          clearInterval(interval);
+          return;
         }
 
-      }
+        if (paused) {
+          return;
+        }
 
+        elapsed += 50;
 
-      if (
-        enemy.type ===
-        "boss"
-      ) {
-
-        enemy.shootCooldown -=
-          dt;
+        setWidth(
+          elements.reloadBar,
+          (
+            elapsed /
+            duration
+          ) * 100
+        );
 
         if (
-          enemy.shootCooldown <= 0
+          elapsed >=
+          duration
         ) {
 
-          const bulletAngle =
-            Math.atan2(
-              player.y - enemy.y,
-              player.x - enemy.x
+          clearInterval(interval);
+
+          const needed =
+            weapon.magazine -
+            player.ammo;
+
+          const amount =
+            Math.min(
+              needed,
+              player.reserveAmmo
             );
 
-          createProjectile(
-            enemy.x,
-            enemy.y,
-            bulletAngle,
-            270,
-            enemy.damage,
-            "enemy",
-            "#ff4b30"
+          player.ammo += amount;
+
+          player.reserveAmmo -= amount;
+
+          player.reloading = false;
+
+          if (
+            elements.reloadIndicator
+          ) {
+            elements.reloadIndicator.classList.add(
+              "hidden"
+            );
+          }
+
+          setWidth(
+            elements.reloadBar,
+            0
           );
 
-          enemy.shootCooldown =
-            1.5;
+          callAudio("reload");
 
+          updateHUD();
         }
 
-      }
-
-      enemy.hitFlash =
-        Math.max(
-          0,
-          enemy.hitFlash - dt
-        );
-
-    }
-  );
-
+      },
+      50
+    );
 }
 
 
-/* =========================================================
-   ACTUALIZAR PROYECTILES
-========================================================= */
+/* ============================================================
+   BALAS
+============================================================ */
 
-function updateProjectiles(dt) {
+function updateBullets(delta) {
 
   for (
     let i =
-      projectiles.length - 1;
+      bullets.length - 1;
     i >= 0;
     i--
   ) {
 
-    const projectile =
-      projectiles[i];
+    const bullet = bullets[i];
 
-    projectile.x +=
-      projectile.vx *
-      dt;
+    const dx =
+      bullet.vx * delta;
 
-    projectile.y +=
-      projectile.vy *
-      dt;
+    const dy =
+      bullet.vy * delta;
 
-    projectile.life -=
-      dt;
+    bullet.x += dx;
+    bullet.y += dy;
+
+    bullet.traveled +=
+      Math.hypot(dx, dy);
 
     let remove = false;
 
-
-    if (
-      projectile.x < -30 ||
-      projectile.x >
-        WORLD.width + 30 ||
-      projectile.y < -30 ||
-      projectile.y >
-        WORLD.height + 30 ||
-      projectile.life <= 0
+    for (
+      let j =
+        enemies.length - 1;
+      j >= 0;
+      j--
     ) {
 
-      remove = true;
-
-    }
-
-
-    if (
-      !remove &&
-      projectile.owner ===
-      "player"
-    ) {
-
-      for (
-        let j =
-          enemies.length - 1;
-        j >= 0;
-        j--
-      ) {
-
-        const enemy =
-          enemies[j];
-
-        if (
-          enemy.hp <= 0
-        )
-          continue;
-
-        const d =
-          distance(
-            projectile,
-            enemy
-          );
-
-        if (
-          d <=
-          projectile.radius +
-          enemy.radius
-        ) {
-
-          enemy.hp -=
-            projectile.damage;
-
-          enemy.hitFlash =
-            .12;
-
-          createFloatingText(
-            enemy.x,
-            enemy.y - 20,
-            Math.round(
-              projectile.damage
-            ),
-            "#ffffff"
-          );
-
-          createParticles(
-            enemy.x,
-            enemy.y,
-            projectile.color,
-            4
-          );
-
-          remove = true;
-
-          if (
-            enemy.hp <= 0
-          ) {
-
-            killEnemy(
-              enemy
-            );
-
-          }
-
-          break;
-
-        }
-
-      }
-
-    }
-
-
-    if (
-      !remove &&
-      projectile.owner ===
-      "enemy"
-    ) {
-
-      const d =
-        distance(
-          projectile,
-          player
-        );
+      const enemy =
+        enemies[j];
 
       if (
-        d <=
-        projectile.radius +
-        player.radius
+        distance(
+          bullet.x,
+          bullet.y,
+          enemy.x,
+          enemy.y
+        ) <
+        bullet.radius +
+        enemy.radius
       ) {
 
-        damagePlayer(
-          projectile.damage
+        enemy.health -=
+          bullet.damage;
+
+        saveData.stats.hits++;
+
+        createHitParticles(
+          enemy.x,
+          enemy.y
         );
 
         remove = true;
 
-      }
+        if (
+          enemy.health <= 0
+        ) {
+          defeatEnemy(j);
+        }
 
+        break;
+      }
     }
 
+    if (
+      currentBoss &&
+      !remove
+    ) {
+
+      if (
+        distance(
+          bullet.x,
+          bullet.y,
+          currentBoss.x,
+          currentBoss.y
+        ) <
+        bullet.radius +
+        currentBoss.radius
+      ) {
+
+        currentBoss.health -=
+          bullet.damage;
+
+        saveData.stats.hits++;
+
+        createHitParticles(
+          currentBoss.x,
+          currentBoss.y
+        );
+
+        remove = true;
+
+        updateBossHUD();
+
+        if (
+          currentBoss.health <= 0
+        ) {
+          defeatBoss();
+        }
+      }
+    }
+
+    if (
+      bullet.traveled >
+      bullet.range
+    ) {
+      remove = true;
+    }
+
+    if (
+      bullet.x < -50 ||
+      bullet.y < -50 ||
+      bullet.x > CANVAS_WIDTH + 50 ||
+      bullet.y > CANVAS_HEIGHT + 50
+    ) {
+      remove = true;
+    }
 
     if (remove) {
-
-      projectiles.splice(
-        i,
-        1
-      );
-
+      bullets.splice(i, 1);
     }
-
   }
-
 }
 
 
-/* =========================================================
-   MUERTE DE ENEMIGO
-========================================================= */
+/* ============================================================
+   OLEADAS
+============================================================ */
 
-function killEnemy(enemy) {
+function startWave() {
 
-  const index =
-    enemies.indexOf(
-      enemy
+  waveEnemiesSpawned = 0;
+  waveEnemiesDefeated = 0;
+
+  waveEnemiesRemaining =
+    6 +
+    saveData.wave * 2 +
+    saveData.sector;
+
+  enemySpawnInterval =
+    Math.max(
+      350,
+      1200 -
+      saveData.wave * 45
     );
+
+  enemySpawnTimer = 300;
+
+  showWaveAnnouncement();
+
+  updateHUD();
+}
+
+
+function updateEnemySpawner(delta) {
 
   if (
-    index !== -1
+    waveEnemiesSpawned >=
+    waveEnemiesRemaining
   ) {
-
-    enemies.splice(
-      index,
-      1
-    );
-
+    return;
   }
 
-  combo++;
-
-  comboTimer =
-    3;
-
-  const reward =
-    enemy.type === "boss"
-      ? 5000 + wave * 500
-      : 150 + wave * 20;
-
-  const xp =
-    enemy.type === "boss"
-      ? 500
-      : 50 + wave * 5;
-
-  score +=
-    reward;
-
-  addCoins(
-    reward
-  );
-
-  addXP(
-    xp
-  );
-
-  saveData.missions.kills++;
+  enemySpawnTimer -=
+    delta * 1000;
 
   if (
-    enemy.type === "boss"
+    enemySpawnTimer <= 0
   ) {
+
+    spawnEnemy();
+
+    waveEnemiesSpawned++;
+
+    enemySpawnTimer =
+      enemySpawnInterval;
+  }
+}
+
+
+function checkWaveCompletion() {
+
+  if (
+    waveEnemiesSpawned <
+    waveEnemiesRemaining
+  ) {
+    return;
+  }
+
+  if (
+    enemies.length > 0 ||
+    currentBoss
+  ) {
+    return;
+  }
+
+  if (
+    waveEnemiesDefeated <
+    waveEnemiesRemaining
+  ) {
+    return;
+  }
+
+  completeWave();
+}
+
+
+function completeWave() {
+
+  saveData.coins +=
+    700 +
+    saveData.wave * 150;
+
+  saveData.xp +=
+    120 +
+    saveData.wave * 30;
+
+  saveData.score +=
+    1000 *
+    saveData.wave;
+
+  levelCheck();
+
+  notify(
+    `Oleada ${saveData.wave} superada`,
+    "success"
+  );
+
+  saveData.wave++;
+
+  if (
+    saveData.wave % 5 === 0
+  ) {
+
+    setTimeout(
+      () => {
+        spawnBoss();
+      },
+      1200
+    );
+
+  } else if (
+    saveData.wave > 10
+  ) {
+
+    saveData.wave = 1;
+    saveData.sector++;
 
     notify(
-      "¡JEFE DERROTADO!"
+      `Nuevo sector desbloqueado: ${saveData.sector}`,
+      "success"
     );
 
-    saveData.crystals +=
-      50;
+    setTimeout(
+      startWave,
+      1200
+    );
 
+  } else {
+
+    setTimeout(
+      startWave,
+      1200
+    );
   }
+
+  saveGame();
+
+  updateAllUI();
+}
+
+
+/* ============================================================
+   ENEMIGOS
+============================================================ */
+
+function spawnEnemy() {
+
+  let enemy;
+
+  if (
+    window.SCORVEX_ENEMIES &&
+    typeof window.SCORVEX_ENEMIES.createEnemy === "function"
+  ) {
+
+    enemy =
+      window.SCORVEX_ENEMIES.createEnemy(
+        saveData.wave,
+        saveData.sector
+      );
+  }
+
+  if (!enemy) {
+
+    const scale =
+      1 +
+      saveData.wave * 0.09 +
+      saveData.sector * 0.12;
+
+    enemy = {
+      health:
+        55 * scale,
+
+      maxHealth:
+        55 * scale,
+
+      speed:
+        random(70, 120) *
+        Math.min(
+          1.7,
+          scale
+        ),
+
+      damage:
+        8 +
+        saveData.wave * 1.2,
+
+      radius:
+        random(15, 22),
+
+      reward:
+        randomInt(70, 160),
+
+      color:
+        "#ff556b"
+    };
+  }
+
+  const point =
+    getSpawnPoint();
+
+  enemy.x =
+    Number(enemy.x) ||
+    point.x;
+
+  enemy.y =
+    Number(enemy.y) ||
+    point.y;
+
+  enemy.maxHealth =
+    Number(
+      enemy.maxHealth ||
+      enemy.health
+    );
+
+  enemy.health =
+    Number(enemy.health) ||
+    enemy.maxHealth;
+
+  enemy.radius =
+    Number(enemy.radius) ||
+    18;
+
+  enemy.speed =
+    Number(enemy.speed) ||
+    100;
+
+  enemy.damage =
+    Number(enemy.damage) ||
+    10;
+
+  enemy.reward =
+    Number(enemy.reward) ||
+    100;
+
+  enemy.attackCooldown =
+    Number(
+      enemy.attackCooldown
+    ) ||
+    800;
+
+  enemy.lastAttack = 0;
+
+  enemies.push(enemy);
+}
+
+
+function getSpawnPoint() {
+
+  const side =
+    randomInt(0, 3);
+
+  switch (side) {
+
+    case 0:
+      return {
+        x: random(0, CANVAS_WIDTH),
+        y: -30
+      };
+
+    case 1:
+      return {
+        x: CANVAS_WIDTH + 30,
+        y: random(0, CANVAS_HEIGHT)
+      };
+
+    case 2:
+      return {
+        x: random(0, CANVAS_WIDTH),
+        y: CANVAS_HEIGHT + 30
+      };
+
+    default:
+      return {
+        x: -30,
+        y: random(0, CANVAS_HEIGHT)
+      };
+  }
+}
+
+
+function updateEnemies(delta) {
+
+  const now =
+    performance.now();
+
+  for (
+    let i =
+      enemies.length - 1;
+    i >= 0;
+    i--
+  ) {
+
+    const enemy =
+      enemies[i];
+
+    const dx =
+      player.x - enemy.x;
+
+    const dy =
+      player.y - enemy.y;
+
+    const length =
+      Math.hypot(dx, dy) || 1;
+
+    enemy.x +=
+      (
+        dx /
+        length
+      ) *
+      enemy.speed *
+      delta;
+
+    enemy.y +=
+      (
+        dy /
+        length
+      ) *
+      enemy.speed *
+      delta;
+
+    if (
+      length <
+      player.radius +
+      enemy.radius +
+      5
+    ) {
+
+      if (
+        now -
+        enemy.lastAttack >
+        enemy.attackCooldown
+      ) {
+
+        enemy.lastAttack =
+          now;
+
+        damagePlayer(
+          enemy.damage
+        );
+      }
+    }
+  }
+
+  updateBoss(delta);
+}
+
+
+/* ============================================================
+   DERROTAR ENEMIGO
+============================================================ */
+
+function defeatEnemy(index) {
+
+  const enemy =
+    enemies[index];
+
+  if (!enemy) {
+    return;
+  }
+
+  enemies.splice(
+    index,
+    1
+  );
+
+  waveEnemiesDefeated++;
+
+  saveData.stats.enemiesDefeated++;
+
+  const coins =
+    Math.round(
+      enemy.reward ||
+      random(70, 160)
+    );
+
+  saveData.coins += coins;
+
+  saveData.score +=
+    100 +
+    saveData.wave * 25;
+
+  saveData.xp +=
+    20 +
+    saveData.wave * 4;
+
+  levelCheck();
 
   createExplosion(
     enemy.x,
     enemy.y,
-    enemy.color
+    "#ff556b"
   );
 
-  if (
-    Math.random() <
-    .08
-  ) {
+  maybeDropPickup(
+    enemy.x,
+    enemy.y
+  );
 
-    pickups.push({
+  updateMissionProgress(
+    "kill",
+    1
+  );
 
-      x: enemy.x,
+  callAudio("enemyDown");
 
-      y: enemy.y,
-
-      type:
-        Math.random() < .5
-          ? "medkit"
-          : "ammo",
-
-      life: 12
-
-    });
-
-  }
-
+  saveGame();
 }
 
 
-/* =========================================================
-   PICKUPS
-========================================================= */
+/* ============================================================
+   JEFE
+============================================================ */
 
-function updatePickups(dt) {
+function spawnBoss() {
+
+  let boss;
+
+  if (
+    window.SCORVEX_ENEMIES &&
+    typeof window.SCORVEX_ENEMIES.createBoss === "function"
+  ) {
+
+    boss =
+      window.SCORVEX_ENEMIES.createBoss(
+        saveData.wave,
+        saveData.sector
+      );
+  }
+
+  const bossHealth =
+    1200 +
+    saveData.wave * 180 +
+    saveData.sector * 300;
+
+  currentBoss =
+    boss || {
+      name: "TITÁN SCORVEX",
+      x: CANVAS_WIDTH / 2,
+      y: 100,
+      radius: 45,
+      health: bossHealth,
+      maxHealth: bossHealth,
+      speed: 60,
+      damage: 24,
+      attackCooldown: 700,
+      reward: 5000,
+      color: "#ff3055"
+    };
+
+  currentBoss.x =
+    Number(currentBoss.x) ||
+    CANVAS_WIDTH / 2;
+
+  currentBoss.y =
+    Number(currentBoss.y) ||
+    100;
+
+  currentBoss.maxHealth =
+    Number(
+      currentBoss.maxHealth ||
+      currentBoss.health
+    );
+
+  currentBoss.health =
+    Number(
+      currentBoss.health
+    ) ||
+    currentBoss.maxHealth;
+
+  currentBoss.radius =
+    Number(
+      currentBoss.radius
+    ) ||
+    45;
+
+  currentBoss.speed =
+    Number(
+      currentBoss.speed
+    ) ||
+    65;
+
+  currentBoss.damage =
+    Number(
+      currentBoss.damage
+    ) ||
+    25;
+
+  currentBoss.attackCooldown =
+    Number(
+      currentBoss.attackCooldown
+    ) ||
+    700;
+
+  currentBoss.lastAttack = 0;
+
+  if (elements.bossHUD) {
+    elements.bossHUD.classList.remove(
+      "hidden"
+    );
+  }
+
+  safeText(
+    elements.bossName,
+    currentBoss.name ||
+    "JEFE"
+  );
+
+  updateBossHUD();
+
+  showArenaMessage(
+    "⚠ JEFE DETECTADO",
+    1800
+  );
+}
+
+
+function updateBoss(delta) {
+
+  if (!currentBoss) {
+    return;
+  }
+
+  const dx =
+    player.x -
+    currentBoss.x;
+
+  const dy =
+    player.y -
+    currentBoss.y;
+
+  const length =
+    Math.hypot(dx, dy) || 1;
+
+  currentBoss.x +=
+    (
+      dx /
+      length
+    ) *
+    currentBoss.speed *
+    delta;
+
+  currentBoss.y +=
+    (
+      dy /
+      length
+    ) *
+    currentBoss.speed *
+    delta;
+
+  const now =
+    performance.now();
+
+  if (
+    length <
+    currentBoss.radius +
+    player.radius +
+    10
+  ) {
+
+    if (
+      now -
+      currentBoss.lastAttack >
+      currentBoss.attackCooldown
+    ) {
+
+      currentBoss.lastAttack =
+        now;
+
+      damagePlayer(
+        currentBoss.damage
+      );
+    }
+  }
+}
+
+
+function defeatBoss() {
+
+  if (!currentBoss) {
+    return;
+  }
+
+  createExplosion(
+    currentBoss.x,
+    currentBoss.y,
+    "#ff2454",
+    45
+  );
+
+  saveData.stats.bossesDefeated++;
+
+  saveData.coins +=
+    Number(
+      currentBoss.reward
+    ) ||
+    5000;
+
+  saveData.crystals += 5;
+
+  saveData.score += 10000;
+
+  saveData.xp += 500;
+
+  levelCheck();
+
+  updateMissionProgress(
+    "boss",
+    1
+  );
+
+  currentBoss = null;
+
+  if (elements.bossHUD) {
+    elements.bossHUD.classList.add(
+      "hidden"
+    );
+  }
+
+  notify(
+    "¡Jefe derrotado! +5 cristales",
+    "success"
+  );
+
+  saveGame();
+
+  setTimeout(
+    startWave,
+    1600
+  );
+}
+
+
+function updateBossHUD() {
+
+  if (!currentBoss) {
+    return;
+  }
+
+  setWidth(
+    elements.bossHealthBar,
+    (
+      currentBoss.health /
+      currentBoss.maxHealth
+    ) *
+    100
+  );
+}
+
+
+/* ============================================================
+   DAÑO AL JUGADOR
+============================================================ */
+
+function damagePlayer(amount) {
+
+  if (
+    player.invulnerable > 0 ||
+    gameOver
+  ) {
+    return;
+  }
+
+  const armor =
+    getArmor();
+
+  let damage =
+    amount *
+    (
+      1 -
+      armor.defense
+    );
+
+  if (player.shield > 0) {
+
+    const absorbed =
+      Math.min(
+        player.shield,
+        damage
+      );
+
+    player.shield -=
+      absorbed;
+
+    damage -=
+      absorbed;
+  }
+
+  if (damage > 0) {
+
+    player.health -=
+      damage;
+  }
+
+  player.health =
+    Math.max(
+      0,
+      player.health
+    );
+
+  player.invulnerable = 250;
+
+  cameraShake = 8;
+
+  callAudio("playerHit");
+
+  if (
+    player.health <= 0
+  ) {
+    endGame(false);
+  }
+
+  updateHUD();
+}
+
+
+/* ============================================================
+   HABILIDAD
+============================================================ */
+
+function useAbility() {
+
+  if (
+    !gameRunning ||
+    paused ||
+    gameOver
+  ) {
+    return;
+  }
+
+  if (
+    !player.abilityReady
+  ) {
+
+    notify(
+      "La habilidad está recargando.",
+      "warning"
+    );
+
+    return;
+  }
+
+  const ability =
+    getAbility();
+
+  const energyCost =
+    Number(
+      ability.energy ||
+      ability.energyCost ||
+      30
+    );
+
+  if (
+    player.energy <
+    energyCost
+  ) {
+
+    notify(
+      "Energía insuficiente.",
+      "warning"
+    );
+
+    return;
+  }
+
+  player.energy -=
+    energyCost;
+
+  player.abilityReady =
+    false;
+
+  activateAbility(
+    saveData.ability,
+    ability
+  );
+
+  const cooldown =
+    Number(
+      ability.cooldown
+    ) ||
+    5000;
+
+  setTimeout(
+    () => {
+
+      player.abilityReady =
+        true;
+
+      updateHUD();
+
+    },
+    cooldown
+  );
+
+  callAudio("ability");
+
+  updateHUD();
+}
+
+
+/* ============================================================
+   EFECTOS DE HABILIDADES
+============================================================ */
+
+function activateAbility(
+  id,
+  ability
+) {
+
+  switch (id) {
+
+    case "dash":
+      abilityDash();
+      break;
+
+    case "freeze":
+      abilityFreeze();
+      break;
+
+    case "storm":
+      abilityStorm();
+      break;
+
+    case "shield":
+      abilityShield();
+      break;
+
+    case "meteor":
+      abilityMeteor();
+      break;
+
+    case "clone":
+      abilityClone();
+      break;
+
+    case "emp":
+      abilityEMP();
+      break;
+
+    case "overdrive":
+      abilityOverdrive();
+      break;
+
+    case "blackhole":
+      abilityBlackHole();
+      break;
+
+    case "nova":
+      abilityNova();
+      break;
+
+    default:
+      genericAbility(
+        ability
+      );
+      break;
+  }
+}
+
+
+function abilityNova() {
+
+  const radius = 260;
+
+  enemies.forEach(
+    (enemy) => {
+
+      if (
+        distance(
+          player.x,
+          player.y,
+          enemy.x,
+          enemy.y
+        ) <= radius
+      ) {
+        enemy.health -= 80;
+      }
+    }
+  );
+
+  cleanDeadEnemies();
+
+  if (
+    currentBoss &&
+    distance(
+      player.x,
+      player.y,
+      currentBoss.x,
+      currentBoss.y
+    ) <= radius
+  ) {
+
+    currentBoss.health -= 120;
+
+    if (
+      currentBoss.health <= 0
+    ) {
+      defeatBoss();
+    }
+  }
+
+  createExplosion(
+    player.x,
+    player.y,
+    "#00e5ff",
+    35
+  );
+
+  showArenaMessage(
+    "NOVA PULSE",
+    750
+  );
+}
+
+
+function abilityDash() {
+
+  player.dashTimer =
+    900;
+
+  player.invulnerable =
+    400;
+
+  showArenaMessage(
+    "PHASE DASH",
+    600
+  );
+}
+
+
+function abilityFreeze() {
+
+  enemies.forEach(
+    (enemy) => {
+
+      enemy.originalSpeed =
+        enemy.originalSpeed ||
+        enemy.speed;
+
+      enemy.speed *= 0.2;
+    }
+  );
+
+  if (currentBoss) {
+    currentBoss.speed *= 0.5;
+  }
+
+  setTimeout(
+    () => {
+
+      enemies.forEach(
+        (enemy) => {
+
+          if (
+            enemy.originalSpeed
+          ) {
+            enemy.speed =
+              enemy.originalSpeed;
+          }
+        }
+      );
+
+    },
+    3000
+  );
+
+  showArenaMessage(
+    "CRYO FIELD",
+    750
+  );
+}
+
+
+function abilityStorm() {
+
+  enemies.forEach(
+    (enemy) => {
+      enemy.health -= 50;
+    }
+  );
+
+  cleanDeadEnemies();
+
+  if (currentBoss) {
+
+    currentBoss.health -= 90;
+
+    if (
+      currentBoss.health <= 0
+    ) {
+      defeatBoss();
+    }
+  }
+
+  showArenaMessage(
+    "ION STORM",
+    750
+  );
+}
+
+
+function abilityShield() {
+
+  player.maxShield =
+    Math.max(
+      player.maxShield,
+      120
+    );
+
+  player.shield =
+    Math.min(
+      player.maxShield,
+      player.shield + 100
+    );
+
+  showArenaMessage(
+    "ENERGY SHIELD",
+    750
+  );
+}
+
+
+function abilityMeteor() {
+
+  enemies.forEach(
+    (enemy) => {
+
+      enemy.health -=
+        random(80, 130);
+    }
+  );
+
+  cleanDeadEnemies();
+
+  if (currentBoss) {
+
+    currentBoss.health -= 180;
+
+    if (
+      currentBoss.health <= 0
+    ) {
+      defeatBoss();
+    }
+  }
+
+  cameraShake = 15;
+
+  showArenaMessage(
+    "METEOR STRIKE",
+    750
+  );
+}
+
+
+function abilityClone() {
+
+  player.invulnerable =
+    1800;
+
+  showArenaMessage(
+    "HOLO CLONE",
+    750
+  );
+}
+
+
+function abilityEMP() {
+
+  enemies.forEach(
+    (enemy) => {
+
+      enemy.stunned = true;
+
+      enemy.oldSpeed =
+        enemy.speed;
+
+      enemy.speed = 0;
+    }
+  );
+
+  setTimeout(
+    () => {
+
+      enemies.forEach(
+        (enemy) => {
+
+          if (
+            enemy.stunned
+          ) {
+            enemy.speed =
+              enemy.oldSpeed ||
+              80;
+
+            enemy.stunned =
+              false;
+          }
+        }
+      );
+
+    },
+    2300
+  );
+
+  showArenaMessage(
+    "EMP BLAST",
+    750
+  );
+}
+
+
+function abilityOverdrive() {
+
+  player.damageMultiplier =
+    1.8;
+
+  player.fireRateMultiplier =
+    1.7;
+
+  setTimeout(
+    () => {
+
+      player.damageMultiplier =
+        1;
+
+      player.fireRateMultiplier =
+        1;
+
+    },
+    5000
+  );
+
+  showArenaMessage(
+    "OVERDRIVE",
+    750
+  );
+}
+
+
+function abilityBlackHole() {
+
+  enemies.forEach(
+    (enemy) => {
+
+      const dx =
+        player.x -
+        enemy.x;
+
+      const dy =
+        player.y -
+        enemy.y;
+
+      enemy.x += dx * 0.45;
+      enemy.y += dy * 0.45;
+
+      enemy.health -= 75;
+    }
+  );
+
+  cleanDeadEnemies();
+
+  showArenaMessage(
+    "BLACK HOLE",
+    750
+  );
+}
+
+
+function genericAbility(
+  ability
+) {
+
+  const type =
+    String(
+      ability.type || ""
+    ).toLowerCase();
+
+  const power =
+    Number(
+      ability.power ||
+      ability.damage ||
+      65
+    );
+
+  if (
+    type.includes("heal")
+  ) {
+
+    player.health =
+      Math.min(
+        player.maxHealth,
+        player.health + power
+      );
+
+  } else if (
+    type.includes("shield")
+  ) {
+
+    player.maxShield =
+      Math.max(
+        player.maxShield,
+        power
+      );
+
+    player.shield =
+      Math.min(
+        player.maxShield,
+        player.shield + power
+      );
+
+  } else if (
+    type.includes("speed")
+  ) {
+
+    player.dashTimer = 1200;
+
+  } else {
+
+    enemies.forEach(
+      (enemy) => {
+        enemy.health -= power;
+      }
+    );
+
+    cleanDeadEnemies();
+
+    if (currentBoss) {
+      currentBoss.health -=
+        power * 1.3;
+    }
+  }
+
+  showArenaMessage(
+    String(
+      ability.name ||
+      "SPECIAL ABILITY"
+    ).toUpperCase(),
+    800
+  );
+}
+
+
+/* ============================================================
+   LIMPIAR ENEMIGOS DERROTADOS POR HABILIDAD
+============================================================ */
+
+function cleanDeadEnemies() {
+
+  for (
+    let i =
+      enemies.length - 1;
+    i >= 0;
+    i--
+  ) {
+
+    if (
+      enemies[i].health <= 0
+    ) {
+      defeatEnemy(i);
+    }
+  }
+}
+
+
+/* ============================================================
+   ENERGÍA
+============================================================ */
+
+function regenerateEnergy(delta) {
+
+  player.energy +=
+    7 * delta;
+
+  player.energy =
+    Math.min(
+      player.maxEnergy,
+      player.energy
+    );
+}
+
+
+/* ============================================================
+   CONSUMIBLES
+============================================================ */
+
+function useMedkit() {
+
+  if (!gameRunning) {
+    return;
+  }
+
+  if (
+    saveData.medkits <= 0
+  ) {
+
+    notify(
+      "No tienes medkits.",
+      "warning"
+    );
+
+    return;
+  }
+
+  if (
+    player.health >=
+    player.maxHealth
+  ) {
+
+    notify(
+      "Tu vida ya está completa.",
+      "warning"
+    );
+
+    return;
+  }
+
+  saveData.medkits--;
+
+  player.health =
+    Math.min(
+      player.maxHealth,
+      player.health + 55
+    );
+
+  callAudio("heal");
+
+  saveGame();
+
+  updateHUD();
+}
+
+
+function useEnergyKit() {
+
+  if (
+    saveData.energyKits <= 0
+  ) {
+
+    notify(
+      "No tienes kits de energía.",
+      "warning"
+    );
+
+    return;
+  }
+
+  if (
+    player.energy >=
+    player.maxEnergy
+  ) {
+    return;
+  }
+
+  saveData.energyKits--;
+
+  player.energy =
+    Math.min(
+      player.maxEnergy,
+      player.energy + 65
+    );
+
+  saveGame();
+
+  updateHUD();
+}
+
+
+function useShieldKit() {
+
+  if (
+    saveData.shieldKits <= 0
+  ) {
+
+    notify(
+      "No tienes kits de escudo.",
+      "warning"
+    );
+
+    return;
+  }
+
+  saveData.shieldKits--;
+
+  player.maxShield =
+    Math.max(
+      player.maxShield,
+      75
+    );
+
+  player.shield =
+    Math.min(
+      player.maxShield,
+      player.shield + 60
+    );
+
+  saveGame();
+
+  updateHUD();
+}
+
+
+/* ============================================================
+   PICKUPS
+============================================================ */
+
+function maybeDropPickup(
+  x,
+  y
+) {
+
+  const roll =
+    Math.random();
+
+  if (roll > 0.18) {
+    return;
+  }
+
+  let type;
+
+  if (roll < 0.06) {
+    type = "medkit";
+  } else if (
+    roll < 0.12
+  ) {
+    type = "energy";
+  } else {
+    type = "coins";
+  }
+
+  pickups.push({
+    x,
+    y,
+    type,
+    radius: 10,
+    life: 15000
+  });
+}
+
+
+function updatePickups(delta) {
 
   for (
     let i =
@@ -3269,129 +2817,171 @@ function updatePickups(dt) {
       pickups[i];
 
     pickup.life -=
-      dt;
+      delta * 1000;
+
+    if (
+      distance(
+        player.x,
+        player.y,
+        pickup.x,
+        pickup.y
+      ) <
+      player.radius +
+      pickup.radius +
+      10
+    ) {
+
+      collectPickup(
+        pickup
+      );
+
+      pickups.splice(i, 1);
+
+      continue;
+    }
 
     if (
       pickup.life <= 0
     ) {
-
-      pickups.splice(
-        i,
-        1
-      );
-
-      continue;
-
+      pickups.splice(i, 1);
     }
-
-    if (
-      distance(
-        pickup,
-        player
-      ) <
-      35
-    ) {
-
-      if (
-        pickup.type ===
-        "medkit"
-      ) {
-
-        player.medkits++;
-
-        saveData.medkits =
-          player.medkits;
-
-        notify(
-          "+1 Botiquín"
-        );
-
-      } else {
-
-        player.reserve +=
-          45;
-
-        notify(
-          "+45 Munición"
-        );
-
-      }
-
-      saveGame();
-
-      pickups.splice(
-        i,
-        1
-      );
-
-    }
-
   }
-
 }
 
 
-/* =========================================================
-   OLEADAS
-========================================================= */
+function collectPickup(
+  pickup
+) {
 
-function checkWave() {
-
-  if (
-    enemies.length === 0 &&
-    gameRunning
+  switch (
+    pickup.type
   ) {
 
-    saveData.missions.waves++;
-
-    addXP(
-      100 +
-      wave * 20
-    );
-
-    wave++;
-
-    player.hp =
-      clamp(
-        player.hp + 10,
-        0,
-        MAX_HP
+    case "medkit":
+      saveData.medkits++;
+      notify(
+        "+1 Medkit",
+        "success"
       );
+      break;
 
-    player.energy =
-      clamp(
-        player.energy + 20,
-        0,
-        MAX_ENERGY
+    case "energy":
+      saveData.energyKits++;
+      notify(
+        "+1 Kit de energía",
+        "success"
       );
+      break;
 
-    player.reserve +=
-      30;
-
-    setTimeout(
-      () => {
-
-        if (gameRunning)
-          spawnWave();
-
-      },
-      1200
-    );
-
+    default:
+      saveData.coins += 250;
+      notify(
+        "+250 monedas",
+        "success"
+      );
+      break;
   }
 
+  saveGame();
 }
 
 
-/* =========================================================
+/* ============================================================
    PARTÍCULAS
-========================================================= */
+============================================================ */
 
-function createParticles(
+function createParticle(
   x,
   y,
   color,
-  amount = 10
+  speed = 140
+) {
+
+  const angle =
+    random(
+      0,
+      Math.PI * 2
+    );
+
+  particles.push({
+    x,
+    y,
+
+    vx:
+      Math.cos(angle) *
+      random(30, speed),
+
+    vy:
+      Math.sin(angle) *
+      random(30, speed),
+
+    size:
+      random(2, 5),
+
+    life:
+      random(250, 700),
+
+    maxLife: 700,
+
+    color
+  });
+}
+
+
+function createHitParticles(
+  x,
+  y
+) {
+
+  for (
+    let i = 0;
+    i < 6;
+    i++
+  ) {
+    createParticle(
+      x,
+      y,
+      "#ff6075",
+      110
+    );
+  }
+}
+
+
+function createMuzzleParticles() {
+
+  const x =
+    player.x +
+    Math.cos(
+      player.angle
+    ) * 28;
+
+  const y =
+    player.y +
+    Math.sin(
+      player.angle
+    ) * 28;
+
+  for (
+    let i = 0;
+    i < 4;
+    i++
+  ) {
+    createParticle(
+      x,
+      y,
+      "#00e5ff",
+      70
+    );
+  }
+}
+
+
+function createExplosion(
+  x,
+  y,
+  color,
+  amount = 20
 ) {
 
   for (
@@ -3399,74 +2989,17 @@ function createParticles(
     i < amount;
     i++
   ) {
-
-    const angle =
-      random(
-        0,
-        Math.PI * 2
-      );
-
-    const speed =
-      random(
-        40,
-        180
-      );
-
-    particles.push({
-
+    createParticle(
       x,
-
       y,
-
-      vx:
-        Math.cos(angle) *
-        speed,
-
-      vy:
-        Math.sin(angle) *
-        speed,
-
-      life:
-        random(
-          .25,
-          .7
-        ),
-
-      maxLife:
-        .7,
-
       color,
-
-      size:
-        random(
-          2,
-          5
-        )
-
-    });
-
+      220
+    );
   }
-
 }
 
 
-function createExplosion(
-  x,
-  y,
-  color
-) {
-
-  createParticles(
-    x,
-    y,
-    color,
-    24
-  );
-
-}
-
-
-function updateParticles(dt) {
+function updateParticles(delta) {
 
   for (
     let i =
@@ -3475,142 +3008,145 @@ function updateParticles(dt) {
     i--
   ) {
 
-    const p =
+    const particle =
       particles[i];
 
-    p.x +=
-      p.vx *
-      dt;
+    particle.x +=
+      particle.vx * delta;
 
-    p.y +=
-      p.vy *
-      dt;
+    particle.y +=
+      particle.vy * delta;
 
-    p.vx *=
-      .97;
+    particle.vx *=
+      0.97;
 
-    p.vy *=
-      .97;
+    particle.vy *=
+      0.97;
 
-    p.life -=
-      dt;
+    particle.life -=
+      delta * 1000;
 
     if (
-      p.life <= 0
+      particle.life <= 0
     ) {
-
       particles.splice(
         i,
         1
       );
-
     }
+  }
+}
 
+
+/* ============================================================
+   RENDER
+============================================================ */
+
+function renderGame() {
+
+  if (!ctx) {
+    return;
   }
 
-}
+  ctx.save();
 
+  ctx.clearRect(
+    0,
+    0,
+    CANVAS_WIDTH,
+    CANVAS_HEIGHT
+  );
 
-/* =========================================================
-   TEXTOS FLOTANTES
-========================================================= */
+  let shakeX = 0;
+  let shakeY = 0;
 
-function createFloatingText(
-  x,
-  y,
-  text,
-  color
-) {
-
-  floatingTexts.push({
-
-    x,
-
-    y,
-
-    text,
-
-    color,
-
-    life: 1,
-
-    maxLife: 1
-
-  });
-
-}
-
-
-function updateFloatingTexts(dt) {
-
-  for (
-    let i =
-      floatingTexts.length - 1;
-    i >= 0;
-    i--
+  if (
+    cameraShake > 0
   ) {
 
-    const item =
-      floatingTexts[i];
-
-    item.y -=
-      35 *
-      dt;
-
-    item.life -=
-      dt;
-
-    if (
-      item.life <= 0
-    ) {
-
-      floatingTexts.splice(
-        i,
-        1
+    shakeX =
+      random(
+        -cameraShake,
+        cameraShake
       );
 
-    }
+    shakeY =
+      random(
+        -cameraShake,
+        cameraShake
+      );
 
+    ctx.translate(
+      shakeX,
+      shakeY
+    );
   }
 
+  drawArena();
+
+  drawPickups();
+
+  drawBullets();
+
+  drawEnemies();
+
+  drawBoss();
+
+  drawPlayer();
+
+  drawParticles();
+
+  ctx.restore();
 }
 
 
-/* =========================================================
-   DIBUJAR FONDO
-========================================================= */
+/* ============================================================
+   ARENA
+============================================================ */
 
-function drawBackground() {
+function drawArena() {
 
-  if (!ctx)
-    return;
+  const gradient =
+    ctx.createRadialGradient(
+      CANVAS_WIDTH / 2,
+      CANVAS_HEIGHT / 2,
+      50,
+      CANVAS_WIDTH / 2,
+      CANVAS_HEIGHT / 2,
+      700
+    );
+
+  gradient.addColorStop(
+    0,
+    "#102235"
+  );
+
+  gradient.addColorStop(
+    1,
+    "#050b13"
+  );
 
   ctx.fillStyle =
-    "#07111b";
+    gradient;
 
   ctx.fillRect(
     0,
     0,
-    WORLD.width,
-    WORLD.height
+    CANVAS_WIDTH,
+    CANVAS_HEIGHT
   );
 
-
-  /* GRID */
-
   ctx.strokeStyle =
-    "#ffffff08";
+    "rgba(0,229,255,0.055)";
 
-  ctx.lineWidth =
-    1;
+  ctx.lineWidth = 1;
 
-  const size =
-    50;
+  const grid = 60;
 
   for (
     let x = 0;
-    x <= WORLD.width;
-    x += size
+    x < CANVAS_WIDTH;
+    x += grid
   ) {
 
     ctx.beginPath();
@@ -3622,17 +3158,16 @@ function drawBackground() {
 
     ctx.lineTo(
       x,
-      WORLD.height
+      CANVAS_HEIGHT
     );
 
     ctx.stroke();
-
   }
 
   for (
     let y = 0;
-    y <= WORLD.height;
-    y += size
+    y < CANVAS_HEIGHT;
+    y += grid
   ) {
 
     ctx.beginPath();
@@ -3643,95 +3178,32 @@ function drawBackground() {
     );
 
     ctx.lineTo(
-      WORLD.width,
+      CANVAS_WIDTH,
       y
     );
 
     ctx.stroke();
-
   }
 
+  ctx.strokeStyle =
+    "rgba(0,229,255,0.15)";
 
-  /* ZONA CENTRAL */
+  ctx.lineWidth = 4;
 
-  const gradient =
-    ctx.createRadialGradient(
-      WORLD.width / 2,
-      WORLD.height / 2,
-      40,
-      WORLD.width / 2,
-      WORLD.height / 2,
-      500
-    );
-
-  gradient.addColorStop(
-    0,
-    "#083d5a55"
+  ctx.strokeRect(
+    5,
+    5,
+    CANVAS_WIDTH - 10,
+    CANVAS_HEIGHT - 10
   );
-
-  gradient.addColorStop(
-    1,
-    "#00000000"
-  );
-
-  ctx.fillStyle =
-    gradient;
-
-  ctx.fillRect(
-    0,
-    0,
-    WORLD.width,
-    WORLD.height
-  );
-
-
-  /* EDIFICIOS */
-
-  ctx.fillStyle =
-    "#0b1724";
-
-  for (
-    let i = 0;
-    i < 12;
-    i++
-  ) {
-
-    const x =
-      (i * 91) % WORLD.width;
-
-    const y =
-      i % 2 === 0
-        ? 70
-        : 500;
-
-    const w =
-      45 +
-      (i % 3) * 25;
-
-    const h =
-      50 +
-      (i % 4) * 20;
-
-    ctx.fillRect(
-      x,
-      y,
-      w,
-      h
-    );
-
-  }
-
 }
 
 
-/* =========================================================
+/* ============================================================
    DIBUJAR JUGADOR
-========================================================= */
+============================================================ */
 
 function drawPlayer() {
-
-  if (!ctx)
-    return;
 
   ctx.save();
 
@@ -3744,1618 +3216,2325 @@ function drawPlayer() {
     player.angle
   );
 
+  if (
+    player.invulnerable > 0 &&
+    Math.floor(
+      player.invulnerable / 70
+    ) % 2 === 0
+  ) {
+    ctx.globalAlpha = 0.5;
+  }
 
-  /* SOMBRA */
+  ctx.shadowBlur = 20;
+  ctx.shadowColor =
+    "#00e5ff";
 
   ctx.fillStyle =
-    "#0008";
+    "#00d7ff";
 
   ctx.beginPath();
 
-  ctx.ellipse(
+  ctx.arc(
     0,
-    15,
-    25,
-    10,
     0,
+    player.radius,
     0,
     Math.PI * 2
   );
 
   ctx.fill();
 
-
-  /* CUERPO */
+  ctx.shadowBlur = 0;
 
   ctx.fillStyle =
-    "#17293a";
+    "#0b1825";
 
-  ctx.strokeStyle =
-    player.color;
-
-  ctx.lineWidth =
-    3;
-
-  ctx.beginPath();
-
-  ctx.roundRect(
-    -16,
-    -10,
+  ctx.fillRect(
+    5,
+    -5,
     32,
-    40,
-    8
+    10
   );
 
-  ctx.fill();
-
-  ctx.stroke();
-
-
-  /* CABEZA */
-
   ctx.fillStyle =
-    "#293c50";
+    "#ffffff";
 
   ctx.beginPath();
 
   ctx.arc(
-    0,
-    -22,
-    13,
+    4,
+    -5,
+    3,
     0,
     Math.PI * 2
   );
 
   ctx.fill();
-
-  ctx.stroke();
-
-
-  /* VISOR */
-
-  ctx.fillStyle =
-    player.color;
-
-  ctx.fillRect(
-    -10,
-    -25,
-    20,
-    6
-  );
-
-
-  /* BRAZO */
-
-  ctx.strokeStyle =
-    "#70869a";
-
-  ctx.lineWidth =
-    8;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    8,
-    0
-  );
-
-  ctx.lineTo(
-    27,
-    0
-  );
-
-  ctx.stroke();
-
-
-  /* ARMA */
-
-  ctx.strokeStyle =
-    "#11161c";
-
-  ctx.lineWidth =
-    7;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    20,
-    0
-  );
-
-  ctx.lineTo(
-    48,
-    0
-  );
-
-  ctx.stroke();
-
-  ctx.strokeStyle =
-    player.color;
-
-  ctx.lineWidth =
-    2;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    26,
-    0
-  );
-
-  ctx.lineTo(
-    48,
-    0
-  );
-
-  ctx.stroke();
-
 
   ctx.restore();
-
-}
-
-
-/* =========================================================
-   DIBUJAR ENEMIGOS
-========================================================= */
-
-function drawEnemy(
-  enemy
-) {
-
-  if (!ctx)
-    return;
-
-  ctx.save();
-
-  ctx.translate(
-    enemy.x,
-    enemy.y
-  );
-
-  const color =
-    enemy.hitFlash > 0
-      ? "#ffffff"
-      : enemy.color;
-
-
-  /* sombra */
-
-  ctx.fillStyle =
-    "#0008";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    0,
-    enemy.radius * .8,
-    enemy.radius * 1.2,
-    enemy.radius * .45,
-    0,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* cuerpo */
-
-  ctx.fillStyle =
-    "#17212d";
-
-  ctx.strokeStyle =
-    color;
-
-  ctx.lineWidth =
-    enemy.type === "boss"
-      ? 4
-      : 2;
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    0,
-    enemy.radius,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-  ctx.stroke();
-
-
-  /* visor */
-
-  ctx.fillStyle =
-    color;
-
-  ctx.fillRect(
-    -enemy.radius * .6,
-    -3,
-    enemy.radius * 1.2,
-    6
-  );
-
-
-  /* barra HP */
-
-  const barWidth =
-    enemy.radius * 2.4;
-
-  const hpPercent =
-    clamp(
-      enemy.hp /
-      enemy.maxHp,
-      0,
-      1
-    );
-
-  ctx.fillStyle =
-    "#000b";
-
-  ctx.fillRect(
-    -barWidth / 2,
-    -enemy.radius - 12,
-    barWidth,
-    5
-  );
-
-  ctx.fillStyle =
-    color;
-
-  ctx.fillRect(
-    -barWidth / 2,
-    -enemy.radius - 12,
-    barWidth *
-      hpPercent,
-    5
-  );
-
-
-  ctx.restore();
-
-}
-
-
-/* =========================================================
-   DIBUJAR PROYECTILES
-========================================================= */
-
-function drawProjectiles() {
-
-  if (!ctx)
-    return;
-
-  projectiles.forEach(
-    projectile => {
-
-      ctx.save();
-
-      ctx.translate(
-        projectile.x,
-        projectile.y
-      );
-
-      ctx.rotate(
-        Math.atan2(
-          projectile.vy,
-          projectile.vx
-        )
-      );
-
-      ctx.fillStyle =
-        projectile.color;
-
-      ctx.shadowBlur =
-        15;
-
-      ctx.shadowColor =
-        projectile.color;
-
-      ctx.fillRect(
-        -7,
-        -2,
-        14,
-        4
-      );
-
-      ctx.restore();
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   DIBUJAR PARTÍCULAS
-========================================================= */
-
-function drawParticles() {
-
-  if (!ctx)
-    return;
-
-  particles.forEach(
-    particle => {
-
-      ctx.globalAlpha =
-        clamp(
-          particle.life /
-          particle.maxLife,
-          0,
-          1
-        );
-
-      ctx.fillStyle =
-        particle.color;
-
-      ctx.beginPath();
-
-      ctx.arc(
-        particle.x,
-        particle.y,
-        particle.size,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-
-    }
-  );
-
-  ctx.globalAlpha = 1;
-
-}
-
-
-/* =========================================================
-   DIBUJAR PICKUPS
-========================================================= */
-
-function drawPickups() {
-
-  if (!ctx)
-    return;
-
-  pickups.forEach(
-    pickup => {
-
-      ctx.save();
-
-      ctx.translate(
-        pickup.x,
-        pickup.y
-      );
-
-      ctx.fillStyle =
-        pickup.type ===
-        "medkit"
-          ? "#36dc83"
-          : "#ffd23f";
-
-      ctx.shadowBlur =
-        15;
-
-      ctx.shadowColor =
-        ctx.fillStyle;
-
-      ctx.fillRect(
-        -10,
-        -10,
-        20,
-        20
-      );
-
-      ctx.fillStyle =
-        "#07111b";
-
-      ctx.font =
-        "bold 14px Arial";
-
-      ctx.textAlign =
-        "center";
-
-      ctx.textBaseline =
-        "middle";
-
-      ctx.fillText(
-        pickup.type ===
-          "medkit"
-          ? "+"
-          : "A",
-        0,
-        0
-      );
-
-      ctx.restore();
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   DIBUJAR TEXTOS
-========================================================= */
-
-function drawFloatingTexts() {
-
-  if (!ctx)
-    return;
-
-  floatingTexts.forEach(
-    item => {
-
-      ctx.globalAlpha =
-        clamp(
-          item.life,
-          0,
-          1
-        );
-
-      ctx.fillStyle =
-        item.color;
-
-      ctx.font =
-        "bold 14px Arial";
-
-      ctx.textAlign =
-        "center";
-
-      ctx.fillText(
-        item.text,
-        item.x,
-        item.y
-      );
-
-    }
-  );
-
-  ctx.globalAlpha = 1;
-
-}
-
-
-/* =========================================================
-   LOOP DE JUEGO
-========================================================= */
-
-function update(dt) {
-
-  if (!gameRunning)
-    return;
-
-  if (gamePaused)
-    return;
-
-  gameTime +=
-    dt;
-
-  fireCooldown =
-    Math.max(
-      0,
-      fireCooldown - dt
-    );
-
-  abilityCooldown =
-    Math.max(
-      0,
-      abilityCooldown - dt
-    );
-
-  comboTimer =
-    Math.max(
-      0,
-      comboTimer - dt
-    );
 
   if (
-    comboTimer <= 0
+    player.shield > 0
   ) {
 
-    combo = 0;
+    ctx.strokeStyle =
+      "rgba(80,170,255,0.55)";
 
-  }
+    ctx.lineWidth = 2;
 
-  player.energy =
-    clamp(
-      player.energy +
-      12 * dt,
+    ctx.beginPath();
+
+    ctx.arc(
+      player.x,
+      player.y,
+      player.radius + 7,
       0,
-      MAX_ENERGY
+      Math.PI * 2
     );
 
-  updatePlayer(dt);
-
-  if (
-    mouseDown
-  ) {
-
-    fireWeapon();
-
+    ctx.stroke();
   }
-
-  updateEnemies(dt);
-
-  updateProjectiles(dt);
-
-  updateParticles(dt);
-
-  updateFloatingTexts(dt);
-
-  updatePickups(dt);
-
-  checkWave();
-
-  updateGameHUD();
-
 }
 
 
-/* =========================================================
-   RENDER
-========================================================= */
+/* ============================================================
+   DIBUJAR BALAS
+============================================================ */
 
-function render() {
+function drawBullets() {
 
-  if (!ctx)
-    return;
-
-  ctx.save();
-
-  drawBackground();
-
-  drawPickups();
-
-  drawProjectiles();
-
-  enemies.forEach(
-    drawEnemy
-  );
-
-  drawPlayer();
-
-  drawParticles();
-
-  drawFloatingTexts();
-
-  ctx.restore();
-
-
-  if (
-    damageFlash > 0
+  for (
+    const bullet
+    of bullets
   ) {
 
     ctx.fillStyle =
-      `rgba(255,0,30,${damageFlash})`;
+      bullet.color ||
+      "#ffffff";
+
+    ctx.shadowBlur = 12;
+
+    ctx.shadowColor =
+      bullet.color ||
+      "#ffffff";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      bullet.x,
+      bullet.y,
+      bullet.radius,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+  }
+}
+
+
+/* ============================================================
+   DIBUJAR ENEMIGOS
+============================================================ */
+
+function drawEnemies() {
+
+  for (
+    const enemy
+    of enemies
+  ) {
+
+    const ratio =
+      enemy.health /
+      enemy.maxHealth;
+
+    ctx.fillStyle =
+      enemy.color ||
+      "#ff5169";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      enemy.x,
+      enemy.y,
+      enemy.radius,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.fillStyle =
+      "rgba(0,0,0,0.65)";
 
     ctx.fillRect(
-      0,
-      0,
-      canvas.width,
-      canvas.height
+      enemy.x - 20,
+      enemy.y -
+      enemy.radius -
+      12,
+      40,
+      5
     );
 
-    damageFlash =
-      Math.max(
+    ctx.fillStyle =
+      "#ff5169";
+
+    ctx.fillRect(
+      enemy.x - 20,
+      enemy.y -
+      enemy.radius -
+      12,
+      40 *
+      clamp(
+        ratio,
         0,
-        damageFlash -
-        .01
+        1
+      ),
+      5
+    );
+  }
+}
+
+
+/* ============================================================
+   DIBUJAR JEFE
+============================================================ */
+
+function drawBoss() {
+
+  if (!currentBoss) {
+    return;
+  }
+
+  ctx.shadowBlur = 25;
+
+  ctx.shadowColor =
+    currentBoss.color ||
+    "#ff2454";
+
+  ctx.fillStyle =
+    currentBoss.color ||
+    "#ff2454";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    currentBoss.x,
+    currentBoss.y,
+    currentBoss.radius,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+
+  ctx.strokeStyle =
+    "#ff9bad";
+
+  ctx.lineWidth = 4;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    currentBoss.x,
+    currentBoss.y,
+    currentBoss.radius + 8,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.stroke();
+}
+
+
+/* ============================================================
+   DIBUJAR PICKUPS
+============================================================ */
+
+function drawPickups() {
+
+  for (
+    const pickup
+    of pickups
+  ) {
+
+    let color =
+      "#ffcc33";
+
+    let icon = "◉";
+
+    if (
+      pickup.type ===
+      "medkit"
+    ) {
+      color = "#35e58b";
+      icon = "+";
+    }
+
+    if (
+      pickup.type ===
+      "energy"
+    ) {
+      color = "#00e5ff";
+      icon = "⚡";
+    }
+
+    ctx.fillStyle =
+      color;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      pickup.x,
+      pickup.y,
+      pickup.radius,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.fillStyle =
+      "#071019";
+
+    ctx.font =
+      "bold 11px Arial";
+
+    ctx.textAlign =
+      "center";
+
+    ctx.textBaseline =
+      "middle";
+
+    ctx.fillText(
+      icon,
+      pickup.x,
+      pickup.y
+    );
+  }
+}
+
+
+/* ============================================================
+   DIBUJAR PARTÍCULAS
+============================================================ */
+
+function drawParticles() {
+
+  for (
+    const particle
+    of particles
+  ) {
+
+    ctx.globalAlpha =
+      clamp(
+        particle.life /
+        particle.maxLife,
+        0,
+        1
       );
 
+    ctx.fillStyle =
+      particle.color;
+
+    ctx.fillRect(
+      particle.x,
+      particle.y,
+      particle.size,
+      particle.size
+    );
   }
 
+  ctx.globalAlpha = 1;
 }
 
 
-/* =========================================================
-   ANIMACIÓN
-========================================================= */
+/* ============================================================
+   XP Y NIVELES
+============================================================ */
 
-function gameLoop(
-  timestamp
+function getRequiredXP(
+  level = saveData.level
 ) {
 
-  if (!gameRunning)
-    return;
-
-  if (!lastTime)
-    lastTime =
-      timestamp;
-
-  const dt =
-    Math.min(
-      .033,
-      (timestamp -
-        lastTime) /
-        1000
-    );
-
-  lastTime =
-    timestamp;
-
-  update(dt);
-
-  render();
-
-  animationId =
-    requestAnimationFrame(
-      gameLoop
-    );
-
+  return (
+    500 +
+    (level - 1) *
+    220
+  );
 }
 
 
-/* =========================================================
-   INICIAR JUEGO
-========================================================= */
+function levelCheck() {
 
-function startGame() {
+  let required =
+    getRequiredXP();
 
-  if (gameRunning)
-    return;
+  while (
+    saveData.xp >=
+    required
+  ) {
 
-  gameRunning =
-    true;
+    saveData.xp -=
+      required;
 
-  gamePaused =
-    false;
+    saveData.level++;
 
-  player.alive =
-    true;
+    saveData.coins +=
+      1000 *
+      saveData.level;
 
-  player.hp =
-    MAX_HP;
+    saveData.crystals += 2;
 
-  player.energy =
-    MAX_ENERGY;
-
-  player.medkits =
-    saveData.medkits;
-
-  player.x =
-    WORLD.width / 2;
-
-  player.y =
-    WORLD.height / 2;
-
-  player.ammo =
-    30;
-
-  player.reserve =
-    120;
-
-  player.defense =
-    0;
-
-  wave =
-    1;
-
-  score =
-    0;
-
-  combo =
-    0;
-
-  enemies = [];
-
-  projectiles = [];
-
-  particles = [];
-
-  floatingTexts = [];
-
-  pickups = [];
-
-  boss = null;
-
-  lastTime = 0;
-
-  showScreen("game");
-
-  spawnWave();
-
-  updateWeaponHUD();
-
-  updateGameHUD();
-
-  startMusic();
-
-  animationId =
-    requestAnimationFrame(
-      gameLoop
+    notify(
+      `¡Nivel ${saveData.level}!`,
+      "success"
     );
 
+    required =
+      getRequiredXP();
+  }
 }
 
 
-/* =========================================================
-   FINALIZAR JUEGO
-========================================================= */
+/* ============================================================
+   MISIONES
+============================================================ */
 
-function endGame() {
+function updateMissionProgress(
+  type,
+  value
+) {
 
-  gameRunning =
-    false;
+  if (
+    window.SCORVEX_MISSIONS &&
+    typeof window.SCORVEX_MISSIONS.update === "function"
+  ) {
 
-  gamePaused =
-    false;
-
-  if (animationId) {
-
-    cancelAnimationFrame(
-      animationId
+    window.SCORVEX_MISSIONS.update(
+      type,
+      value,
+      saveData
     );
+  }
+}
 
-    animationId =
-      null;
 
+function getMissionText() {
+
+  if (
+    window.SCORVEX_MISSIONS &&
+    typeof window.SCORVEX_MISSIONS.getCurrent === "function"
+  ) {
+
+    const mission =
+      window.SCORVEX_MISSIONS.getCurrent(
+        saveData
+      );
+
+    if (mission) {
+
+      if (
+        typeof mission ===
+        "string"
+      ) {
+        return mission;
+      }
+
+      return (
+        mission.description ||
+        mission.name ||
+        "Misión activa"
+      );
+    }
   }
 
-  saveData.score =
-    Math.max(
-      saveData.score,
-      score
-    );
-
-  saveGame();
-
-  notify(
-    "Partida terminada · Puntos: " +
-    score.toLocaleString()
+  return (
+    `Derrota enemigos: ` +
+    `${saveData.stats.enemiesDefeated}`
   );
-
-  setTimeout(
-    () => {
-
-      showScreen("menu");
-
-      updateMenuHUD();
-
-    },
-    1200
-  );
-
 }
 
 
-/* =========================================================
-   HUD DEL JUEGO
-========================================================= */
+/* ============================================================
+   HUD
+============================================================ */
 
-function updateGameHUD() {
-
-  if ($("#hp"))
-    $("#hp").textContent =
-      Math.ceil(player.hp);
-
-  if ($("#energy"))
-    $("#energy").textContent =
-      Math.ceil(player.energy);
-
-  if ($("#wave"))
-    $("#wave").textContent =
-      wave;
-
-  if ($("#score"))
-    $("#score").textContent =
-      score.toLocaleString();
-
-  if ($("#hpbar"))
-    $("#hpbar").style.width =
-      clamp(
-        player.hp /
-        MAX_HP *
-        100,
-        0,
-        100
-      ) + "%";
-
-  if ($("#energybar"))
-    $("#energybar").style.width =
-      clamp(
-        player.energy /
-        MAX_ENERGY *
-        100,
-        0,
-        100
-      ) + "%";
-
-  if ($("#ammo"))
-    $("#ammo").textContent =
-      player.ammo;
-
-  if ($("#reserve"))
-    $("#reserve").textContent =
-      player.reserve;
-
-}
-
-
-/* =========================================================
-   HUD DEL ARMA
-========================================================= */
-
-function updateWeaponHUD() {
+function updateHUD() {
 
   const weapon =
-    getCurrentWeapon();
+    getWeapon();
 
-  if (!weapon)
-    return;
+  const ability =
+    getAbility();
 
-  if ($("#weaponName"))
-    $("#weaponName").textContent =
-      weapon.name;
+  const armor =
+    getArmor();
 
-  if ($("#weaponIcon"))
-    $("#weaponIcon").innerHTML =
-      weapon.icon ||
-      "🔫";
+  safeText(
+    elements.healthText,
+    `${Math.ceil(player.health)} / ${player.maxHealth}`
+  );
 
+  setWidth(
+    elements.healthBar,
+    (
+      player.health /
+      player.maxHealth
+    ) *
+    100
+  );
+
+  safeText(
+    elements.shieldText,
+    Math.ceil(
+      player.shield
+    )
+  );
+
+  setWidth(
+    elements.shieldBar,
+    player.maxShield > 0
+      ? (
+          player.shield /
+          player.maxShield
+        ) * 100
+      : 0
+  );
+
+  safeText(
+    elements.gameLevel,
+    saveData.level
+  );
+
+  setWidth(
+    elements.xpBar,
+    (
+      saveData.xp /
+      getRequiredXP()
+    ) *
+    100
+  );
+
+  safeText(
+    elements.sectorText,
+    saveData.sector
+  );
+
+  safeText(
+    elements.waveText,
+    saveData.wave
+  );
+
+  safeText(
+    elements.hudWeapon,
+    weapon.name
+  );
+
+  safeText(
+    elements.hudAmmo,
+    `${player.ammo} / ${player.reserveAmmo}`
+  );
+
+  safeText(
+    elements.hudAbility,
+    ability.name ||
+    "Habilidad"
+  );
+
+  safeText(
+    elements.hudEnergy,
+    player.abilityReady
+      ? `ENERGÍA ${Math.floor(player.energy)}`
+      : `RECARGANDO · ${Math.floor(player.energy)}`
+  );
+
+  safeText(
+    elements.hudArmor,
+    armor.name
+  );
+
+  safeText(
+    elements.medkitCount,
+    saveData.medkits
+  );
+
+  safeText(
+    elements.energyKitCount,
+    saveData.energyKits
+  );
+
+  safeText(
+    elements.shieldKitCount,
+    saveData.shieldKits
+  );
+
+  safeText(
+    elements.gameMission,
+    getMissionText()
+  );
+
+  updateBossHUD();
 }
 
 
-/* =========================================================
+/* ============================================================
+   UI GENERAL
+============================================================ */
+
+function updateMenuUI() {
+
+  const weapon =
+    getWeapon();
+
+  const ability =
+    getAbility();
+
+  const armor =
+    getArmor();
+
+  safeText(
+    elements.menuCoins,
+    formatNumber(
+      saveData.coins
+    )
+  );
+
+  safeText(
+    elements.menuCrystals,
+    formatNumber(
+      saveData.crystals
+    )
+  );
+
+  safeText(
+    elements.menuLevel,
+    saveData.level
+  );
+
+  safeText(
+    elements.menuWeapon,
+    weapon.name
+  );
+
+  safeText(
+    elements.menuAbility,
+    ability.name ||
+    "Habilidad"
+  );
+
+  safeText(
+    elements.menuArmor,
+    armor.name
+  );
+
+  safeText(
+    elements.menuScore,
+    formatNumber(
+      saveData.score
+    )
+  );
+
+  safeText(
+    elements.menuMission,
+    getMissionText()
+  );
+
+  safeText(
+    elements.shopCoins,
+    formatNumber(
+      saveData.coins
+    )
+  );
+
+  safeText(
+    elements.shopCrystals,
+    formatNumber(
+      saveData.crystals
+    )
+  );
+}
+
+
+function updateAllUI() {
+
+  updateMenuUI();
+
+  updateHUD();
+
+  if (
+    window.SCORVEX_SHOP &&
+    typeof window.SCORVEX_SHOP.render === "function"
+  ) {
+    window.SCORVEX_SHOP.render(
+      saveData
+    );
+  }
+
+  if (
+    window.SCORVEX_INVENTORY &&
+    typeof window.SCORVEX_INVENTORY.render === "function"
+  ) {
+    window.SCORVEX_INVENTORY.render(
+      saveData
+    );
+  }
+}
+
+
+/* ============================================================
+   PANTALLAS
+============================================================ */
+
+function showScreen(
+  id
+) {
+
+  document
+    .querySelectorAll(
+      ".screen"
+    )
+    .forEach(
+      (screen) => {
+        screen.classList.remove(
+          "active"
+        );
+      }
+    );
+
+  const screen =
+    $(id);
+
+  if (screen) {
+    screen.classList.add(
+      "active"
+    );
+  }
+}
+
+
+function showMainMenu() {
+
+  gameRunning = false;
+  paused = false;
+  gameOver = false;
+
+  showScreen(
+    "mainMenu"
+  );
+
+  if (
+    elements.pauseModal
+  ) {
+    elements.pauseModal.classList.add(
+      "hidden"
+    );
+  }
+
+  callAudio("playMenuMusic");
+
+  updateAllUI();
+}
+
+
+/* ============================================================
    PAUSA
-========================================================= */
+============================================================ */
 
-function pauseGame() {
+function togglePause() {
 
-  if (!gameRunning)
+  if (!gameRunning) {
     return;
+  }
 
-  gamePaused =
-    true;
+  paused =
+    !paused;
 
-  $("#pauseModal")
-    ?.classList
-    .remove("hidden");
+  if (
+    elements.pauseModal
+  ) {
 
+    elements.pauseModal.classList.toggle(
+      "hidden",
+      !paused
+    );
+  }
 }
 
 
 function resumeGame() {
 
-  gamePaused =
-    false;
+  paused = false;
 
-  $("#pauseModal")
-    ?.classList
-    .add("hidden");
+  if (
+    elements.pauseModal
+  ) {
+    elements.pauseModal.classList.add(
+      "hidden"
+    );
+  }
 
-  lastTime = 0;
-
+  lastFrame =
+    performance.now();
 }
 
 
-$("#pause")
-  ?.addEventListener(
-    "click",
-    pauseGame
-  );
+/* ============================================================
+   FIN DE PARTIDA
+============================================================ */
 
+function endGame(
+  victory = false
+) {
 
-$("#resume")
-  ?.addEventListener(
-    "click",
-    resumeGame
-  );
+  gameOver = true;
 
+  player.shooting = false;
 
-$("#quit")
-  ?.addEventListener(
-    "click",
-    () => {
+  saveGame();
 
-      $("#pauseModal")
-        ?.classList
-        .add("hidden");
+  openModal({
+    icon:
+      victory
+        ? "🏆"
+        : "⚠",
 
-      endGame();
+    title:
+      victory
+        ? "VICTORIA"
+        : "MISIÓN FALLIDA",
 
-    }
-  );
+    content:
+      `
+        <div class="result-card">
 
+          <div class="result-title ${
+            victory
+              ? "victory"
+              : "defeat"
+          }">
 
-/* =========================================================
-   BOTONES
-========================================================= */
+            ${
+              victory
+                ? "SECTOR COMPLETADO"
+                : "HAS CAÍDO"
+            }
 
-$("#play")
-  ?.addEventListener(
-    "click",
-    () => {
+          </div>
 
-      getAudioContext()
-        ?.resume();
+          <div class="result-stats">
 
-      startGame();
+            <div class="result-stat">
+              <span>PUNTUACIÓN</span>
+              <strong>
+                ${formatNumber(saveData.score)}
+              </strong>
+            </div>
 
-    }
-  );
+            <div class="result-stat">
+              <span>ENEMIGOS</span>
+              <strong>
+                ${formatNumber(saveData.stats.enemiesDefeated)}
+              </strong>
+            </div>
 
+            <div class="result-stat">
+              <span>NIVEL</span>
+              <strong>
+                ${saveData.level}
+              </strong>
+            </div>
 
-$("#ability")
-  ?.addEventListener(
-    "click",
-    useAbility
-  );
+            <div class="result-stat">
+              <span>SECTOR</span>
+              <strong>
+                ${saveData.sector}
+              </strong>
+            </div>
 
+          </div>
 
-$("#medkit")
-  ?.addEventListener(
-    "click",
-    useMedkit
-  );
+        </div>
+      `,
 
+    actions: [
+      {
+        text:
+          "↻ JUGAR DE NUEVO",
 
-$("#reload")
-  ?.addEventListener(
-    "click",
-    reloadWeapon
-  );
+        className:
+          "btn btn-primary",
 
+        callback() {
+          closeModal();
+          startGame();
+        }
+      },
 
-$("#fire")
-  ?.addEventListener(
-    "pointerdown",
-    event => {
+      {
+        text:
+          "← MENÚ",
 
-      event.preventDefault();
+        className:
+          "btn btn-secondary",
 
-      fireWeapon();
-
-    }
-  );
-
-
-$("#exit")
-  ?.addEventListener(
-    "click",
-    () => {
-
-      endGame();
-
-    }
-  );
-
-
-$("#gameMusic")
-  ?.addEventListener(
-    "click",
-    () => {
-
-      saveData.musicEnabled =
-        !saveData.musicEnabled;
-
-      if (
-        saveData.musicEnabled
-      ) {
-
-        startMusic();
-
-      } else {
-
-        stopMusic();
-
+        callback() {
+          closeModal();
+          showMainMenu();
+        }
       }
+    ]
+  });
+}
 
-      saveGame();
 
-    }
+/* ============================================================
+   MODAL
+============================================================ */
+
+function openModal({
+  icon = "⚡",
+  title = "SCORVEX",
+  content = "",
+  actions = []
+}) {
+
+  if (
+    !elements.modal
+  ) {
+    return;
+  }
+
+  elements.modal.classList.remove(
+    "hidden"
   );
 
+  safeText(
+    elements.modalIcon,
+    icon
+  );
 
-$("#gameInventory")
-  ?.addEventListener(
-    "click",
-    () => {
+  safeText(
+    elements.modalTitle,
+    title
+  );
 
-      pauseGame();
+  if (
+    elements.modalContent
+  ) {
+    elements.modalContent.innerHTML =
+      content;
+  }
 
-      showScreen(
-        "inventory"
+  if (
+    elements.modalActions
+  ) {
+
+    elements.modalActions.innerHTML =
+      "";
+
+    for (
+      const action
+      of actions
+    ) {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+      button.type =
+        "button";
+
+      button.className =
+        action.className ||
+        "btn btn-secondary";
+
+      button.textContent =
+        action.text ||
+        "ACEPTAR";
+
+      button.addEventListener(
+        "click",
+        action.callback
       );
 
-      renderInventory();
-
+      elements.modalActions.appendChild(
+        button
+      );
     }
-  );
-
-
-/* =========================================================
-   TECLADO
-========================================================= */
-
-window.addEventListener(
-  "keydown",
-  event => {
-
-    keys[
-      event.key
-    ] = true;
-
-    const key =
-      event.key.toLowerCase();
-
-    keys[key] = true;
-
-
-    if (
-      key === " "
-    ) {
-
-      event.preventDefault();
-
-      useAbility();
-
-    }
-
-
-    if (
-      key === "q"
-    ) {
-
-      useAbility();
-
-    }
-
-
-    if (
-      key === "h"
-    ) {
-
-      useMedkit();
-
-    }
-
-
-    if (
-      key === "r"
-    ) {
-
-      reloadWeapon();
-
-    }
-
-
-    if (
-      key === "escape"
-    ) {
-
-      if (
-        gameRunning &&
-        !gamePaused
-      ) {
-
-        pauseGame();
-
-      } else if (
-        gameRunning &&
-        gamePaused
-      ) {
-
-        resumeGame();
-
-      }
-
-    }
-
   }
-);
-
-
-window.addEventListener(
-  "keyup",
-  event => {
-
-    keys[
-      event.key
-    ] = false;
-
-    keys[
-      event.key.toLowerCase()
-    ] = false;
-
-  }
-);
-
-
-/* =========================================================
-   RATÓN
-========================================================= */
-
-canvas?.addEventListener(
-  "mousemove",
-  event => {
-
-    const rect =
-      canvas.getBoundingClientRect();
-
-    mouseX =
-      (
-        event.clientX -
-        rect.left
-      ) *
-      WORLD.width /
-      rect.width;
-
-    mouseY =
-      (
-        event.clientY -
-        rect.top
-      ) *
-      WORLD.height /
-      rect.height;
-
-  }
-);
-
-
-canvas?.addEventListener(
-  "mousedown",
-  event => {
-
-    if (
-      event.button === 0
-    ) {
-
-      mouseDown =
-        true;
-
-      fireWeapon();
-
-    }
-
-  }
-);
-
-
-window.addEventListener(
-  "mouseup",
-  event => {
-
-    if (
-      event.button === 0
-    ) {
-
-      mouseDown =
-        false;
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   CONTROLES TÁCTILES
-========================================================= */
-
-$$("[data-key]").forEach(
-  button => {
-
-    const key =
-      button.dataset.key;
-
-    const press =
-      event => {
-
-        event.preventDefault();
-
-        keys[key] =
-          true;
-
-      };
-
-    const release =
-      event => {
-
-        event.preventDefault();
-
-        keys[key] =
-          false;
-
-      };
-
-    button.addEventListener(
-      "pointerdown",
-      press
-    );
-
-    button.addEventListener(
-      "pointerup",
-      release
-    );
-
-    button.addEventListener(
-      "pointercancel",
-      release
-    );
-
-    button.addEventListener(
-      "pointerleave",
-      release
-    );
-
-  }
-);
-
-
-/* =========================================================
-   SONIDOS
-========================================================= */
-
-function playShotSound() {
-
-  playTone(
-    180 +
-    random(0, 80),
-    .07,
-    .06,
-    "square"
-  );
-
 }
 
 
-function playAbilitySound() {
+function closeModal() {
 
-  playTone(
-    480,
-    .1,
-    .05,
-    "sine"
+  if (
+    elements.modal
+  ) {
+    elements.modal.classList.add(
+      "hidden"
+    );
+  }
+}
+
+
+/* ============================================================
+   NOTIFICACIONES
+============================================================ */
+
+function notify(
+  message,
+  type = ""
+) {
+
+  if (
+    !elements.notifications
+  ) {
+    return;
+  }
+
+  const notification =
+    document.createElement(
+      "div"
+    );
+
+  notification.className =
+    `notification ${type}`;
+
+  notification.textContent =
+    message;
+
+  elements.notifications.appendChild(
+    notification
   );
 
   setTimeout(
     () => {
 
-      playTone(
-        720,
-        .15,
-        .04,
-        "triangle"
+      notification.style.opacity =
+        "0";
+
+      notification.style.transform =
+        "translateX(25px)";
+
+      setTimeout(
+        () => {
+          notification.remove();
+        },
+        300
       );
 
     },
-    60
+    2600
   );
-
 }
 
 
-/* =========================================================
-   ESCAPAR HTML
-========================================================= */
+/* ============================================================
+   MENSAJE DE OLEADA
+============================================================ */
 
-function escapeHTML(
-  value
-) {
+function showWaveAnnouncement() {
 
-  return String(value)
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
-
-}
-
-
-/* =========================================================
-   PANTALLA DE CARGA
-========================================================= */
-
-function bootGame() {
-
-  let progress = 0;
-
-  const bar =
-    $("#progress");
-
-  const text =
-    $("#bootText");
-
-  const messages = [
-
-    "Cargando SCORVEX...",
-
-    "Preparando arsenal...",
-
-    "Inicializando 1000 armas...",
-
-    "Preparando habilidades...",
-
-    "Preparando arena...",
-
-    "Iniciando G7..."
-
-  ];
-
-  const timer =
-    setInterval(
-      () => {
-
-        progress +=
-          randomInt(
-            7,
-            15
-          );
-
-        progress =
-          Math.min(
-            progress,
-            100
-          );
-
-        if (bar)
-          bar.style.width =
-            progress + "%";
-
-        if (text) {
-
-          const index =
-            Math.min(
-              messages.length - 1,
-              Math.floor(
-                progress /
-                20
-              )
-            );
-
-          text.textContent =
-            messages[index];
-
-        }
-
-        if (
-          progress >= 100
-        ) {
-
-          clearInterval(timer);
-
-          setTimeout(
-            () => {
-
-              boot?.classList
-                .add("hidden");
-
-              app?.classList
-                .remove("hidden");
-
-              updateMenuHUD();
-
-              updateCharacterPreview();
-
-            },
-            350
-          );
-
-        }
-
-      },
-      120
-    );
-
-}
-
-
-/* =========================================================
-   COMPATIBILIDAD DE ARMAS
-========================================================= */
-
-function normalizeWeaponData() {
-
-  const first =
-    weapons.weapon_0001;
-
-  if (!first) {
-
-    console.error(
-      "No se encontró weapon_0001."
-    );
-
+  if (
+    !elements.waveAnnouncement
+  ) {
     return;
-
   }
 
-  Object.values(weapons)
+  safeText(
+    elements.waveAnnouncementNumber,
+    saveData.wave
+  );
+
+  elements.waveAnnouncement.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(
+    () => {
+
+      elements.waveAnnouncement.classList.add(
+        "hidden"
+      );
+
+    },
+    1200
+  );
+}
+
+
+function showArenaMessage(
+  message,
+  duration = 1000
+) {
+
+  if (
+    !elements.arenaMessage
+  ) {
+    return;
+  }
+
+  safeText(
+    elements.arenaMessage,
+    message
+  );
+
+  elements.arenaMessage.classList.remove(
+    "hidden"
+  );
+
+  setTimeout(
+    () => {
+
+      elements.arenaMessage.classList.add(
+        "hidden"
+      );
+
+    },
+    duration
+  );
+}
+
+
+/* ============================================================
+   COLORES DE RAREZA
+============================================================ */
+
+function getRarityColor(
+  rarity
+) {
+
+  const colors = {
+    common: "#b9c1cf",
+    uncommon: "#35e58b",
+    rare: "#4a90ff",
+    epic: "#a65dff",
+    legendary: "#ffb547",
+    mythic: "#ff4c96",
+    ancient: "#ff5932",
+    omega: "#00e5ff"
+  };
+
+  return (
+    colors[
+      String(
+        rarity ||
+        "common"
+      ).toLowerCase()
+    ] ||
+    "#ffffff"
+  );
+}
+
+
+/* ============================================================
+   AUDIO
+============================================================ */
+
+function callAudio(
+  method,
+  ...args
+) {
+
+  try {
+
+    const audio =
+      window.SCORVEX_AUDIO;
+
+    if (
+      audio &&
+      typeof audio[method] ===
+      "function"
+    ) {
+
+      audio[method](
+        ...args
+      );
+    }
+
+  } catch (error) {
+
+    console.warn(
+      "[SCORVEX AUDIO]",
+      error
+    );
+  }
+}
+
+
+function toggleMusic() {
+
+  saveData.musicEnabled =
+    !saveData.musicEnabled;
+
+  saveGame();
+
+  if (
+    window.SCORVEX_AUDIO
+  ) {
+
+    if (
+      typeof window.SCORVEX_AUDIO.setMusicEnabled ===
+      "function"
+    ) {
+
+      window.SCORVEX_AUDIO.setMusicEnabled(
+        saveData.musicEnabled
+      );
+
+    } else if (
+      saveData.musicEnabled
+    ) {
+
+      callAudio(
+        "playMenuMusic"
+      );
+
+    } else {
+
+      callAudio(
+        "stopMusic"
+      );
+    }
+  }
+
+  updateMusicButtons();
+}
+
+
+function toggleSound() {
+
+  saveData.soundEnabled =
+    !saveData.soundEnabled;
+
+  saveGame();
+
+  if (
+    window.SCORVEX_AUDIO &&
+    typeof window.SCORVEX_AUDIO.setSoundEnabled ===
+    "function"
+  ) {
+
+    window.SCORVEX_AUDIO.setSoundEnabled(
+      saveData.soundEnabled
+    );
+  }
+
+  updateMusicButtons();
+}
+
+
+function selectMusicTrack(
+  index
+) {
+
+  saveData.selectedTrack =
+    Number(index) || 0;
+
+  saveGame();
+
+  document
+    .querySelectorAll(
+      ".music-btn"
+    )
     .forEach(
-      weapon => {
+      (button) => {
 
-        if (
-          typeof weapon.price !==
-          "number"
-        ) {
-
-          weapon.price =
-            5000;
-
-        }
-
-        if (
-          typeof weapon.damage !==
-          "number"
-        ) {
-
-          weapon.damage =
-            20;
-
-        }
-
-        if (
-          typeof weapon.fireRate !==
-          "number"
-        ) {
-
-          weapon.fireRate =
-            60;
-
-        }
-
-        if (
-          typeof weapon.accuracy !==
-          "number"
-        ) {
-
-          weapon.accuracy =
-            70;
-
-        }
-
-        if (!weapon.type) {
-
-          weapon.type =
-            "rifle";
-
-        }
-
-        if (!weapon.rarity) {
-
-          weapon.rarity =
-            "common";
-
-        }
-
+        button.classList.toggle(
+          "active",
+          Number(
+            button.dataset.track
+          ) ===
+          saveData.selectedTrack
+        );
       }
     );
 
+  if (
+    window.SCORVEX_AUDIO &&
+    typeof window.SCORVEX_AUDIO.selectTrack ===
+    "function"
+  ) {
+
+    window.SCORVEX_AUDIO.selectTrack(
+      saveData.selectedTrack
+    );
+  }
 }
 
 
-/* =========================================================
-   INICIALIZACIÓN
-========================================================= */
+function updateMusicButtons() {
 
-function initializeGame() {
+  const music =
+    $("btnMusic");
 
-  normalizeWeaponData();
+  const sound =
+    $("btnSound");
 
-  updateMenuHUD();
+  if (music) {
 
-  updateCharacterPreview();
+    music.textContent =
+      saveData.musicEnabled
+        ? "♫ MÚSICA: ON"
+        : "♫ MÚSICA: OFF";
+  }
 
-  renderMusic();
+  if (sound) {
 
-  renderMissions();
-
-  console.log(
-    `%cSCORVEX ${VERSION} iniciado`,
-    "color:#00aaff;font-weight:bold"
-  );
-
-  console.log(
-    "Armas:",
-    Object.keys(weapons).length
-  );
-
-  console.log(
-    "Habilidades:",
-    Object.keys(abilities).length
-  );
-
-  console.log(
-    "Armaduras:",
-    Object.keys(armors).length
-  );
-
-  console.assert(
-    Object.keys(weapons).length === 1000,
-    "ERROR: no hay 1000 armas."
-  );
-
-  console.assert(
-    Object.keys(abilities).length === 90,
-    "ERROR: no hay 90 habilidades."
-  );
-
+    sound.textContent =
+      saveData.soundEnabled
+        ? "🔊 SONIDO: ON"
+        : "🔇 SONIDO: OFF";
+  }
 }
 
 
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
+/* ============================================================
+   CONTROLES MÓVILES
+============================================================ */
 
-    initializeGame();
+let joystickActive = false;
 
-    bootGame();
-
-  }
-);
-
-
-/* =========================================================
-   EVITAR PÉRDIDA DE PARTIDA
-========================================================= */
-
-window.addEventListener(
-  "beforeunload",
-  () => {
-
-    saveGame();
-
-  }
-);
-
-
-/* =========================================================
-   ATAJOS G7
-========================================================= */
-
-window.SCORVEX = {
-
-  version: VERSION,
-
-  weapons,
-
-  abilities,
-
-  armors,
-
-  saveData,
-
-  startGame,
-
-  endGame,
-
-  saveGame,
-
-  loadSave,
-
-  buyOrEquipWeapon,
-
-  useAbility,
-
-  useMedkit,
-
-  reloadWeapon
-
+let joystickOrigin = {
+  x: 0,
+  y: 0
 };
 
 
-/* =========================================================
-   FIN DE GAME.JS
-========================================================= */
+function setupMobileControls() {
+
+  const joystick =
+    $("joystick");
+
+  const knob =
+    $("joystickKnob");
+
+  if (
+    joystick &&
+    knob
+  ) {
+
+    joystick.addEventListener(
+      "touchstart",
+      (event) => {
+
+        event.preventDefault();
+
+        const touch =
+          event.touches[0];
+
+        const rect =
+          joystick.getBoundingClientRect();
+
+        joystickOrigin.x =
+          rect.left +
+          rect.width / 2;
+
+        joystickOrigin.y =
+          rect.top +
+          rect.height / 2;
+
+        joystickActive =
+          true;
+
+        updateJoystick(
+          touch,
+          knob
+        );
+
+      },
+      {
+        passive: false
+      }
+    );
+
+
+    joystick.addEventListener(
+      "touchmove",
+      (event) => {
+
+        event.preventDefault();
+
+        if (
+          !joystickActive
+        ) {
+          return;
+        }
+
+        updateJoystick(
+          event.touches[0],
+          knob
+        );
+
+      },
+      {
+        passive: false
+      }
+    );
+
+
+    joystick.addEventListener(
+      "touchend",
+      () => {
+
+        joystickActive =
+          false;
+
+        knob.style.transform =
+          "translate(-50%, -50%)";
+
+        keys.KeyW = false;
+        keys.KeyA = false;
+        keys.KeyS = false;
+        keys.KeyD = false;
+      }
+    );
+  }
+
+
+  const shoot =
+    $("mobileShoot");
+
+  if (shoot) {
+
+    shoot.addEventListener(
+      "touchstart",
+      (event) => {
+
+        event.preventDefault();
+
+        player.shooting =
+          true;
+
+      },
+      {
+        passive: false
+      }
+    );
+
+    shoot.addEventListener(
+      "touchend",
+      () => {
+        player.shooting =
+          false;
+      }
+    );
+  }
+
+
+  const ability =
+    $("mobileAbility");
+
+  if (ability) {
+    ability.addEventListener(
+      "click",
+      useAbility
+    );
+  }
+
+
+  const reload =
+    $("mobileReload");
+
+  if (reload) {
+    reload.addEventListener(
+      "click",
+      reloadWeapon
+    );
+  }
+}
+
+
+function updateJoystick(
+  touch,
+  knob
+) {
+
+  let dx =
+    touch.clientX -
+    joystickOrigin.x;
+
+  let dy =
+    touch.clientY -
+    joystickOrigin.y;
+
+  const max = 35;
+
+  const length =
+    Math.hypot(dx, dy);
+
+  if (
+    length > max
+  ) {
+
+    dx =
+      (
+        dx /
+        length
+      ) *
+      max;
+
+    dy =
+      (
+        dy /
+        length
+      ) *
+      max;
+  }
+
+  knob.style.transform =
+    `translate(
+      calc(-50% + ${dx}px),
+      calc(-50% + ${dy}px)
+    )`;
+
+  const deadZone = 8;
+
+  keys.KeyA =
+    dx < -deadZone;
+
+  keys.KeyD =
+    dx > deadZone;
+
+  keys.KeyW =
+    dy < -deadZone;
+
+  keys.KeyS =
+    dy > deadZone;
+
+  if (
+    Math.abs(dx) >
+    deadZone ||
+    Math.abs(dy) >
+    deadZone
+  ) {
+
+    player.angle =
+      Math.atan2(
+        dy,
+        dx
+      );
+  }
+}
+
+
+/* ============================================================
+   TIENDA
+============================================================ */
+
+function openShop() {
+
+  showScreen(
+    "shopScreen"
+  );
+
+  updateAllUI();
+
+  if (
+    window.SCORVEX_SHOP &&
+    typeof window.SCORVEX_SHOP.render ===
+    "function"
+  ) {
+
+    window.SCORVEX_SHOP.render(
+      saveData
+    );
+  }
+}
+
+
+/* ============================================================
+   INVENTARIO
+============================================================ */
+
+function openInventory() {
+
+  showScreen(
+    "inventoryScreen"
+  );
+
+  updateAllUI();
+
+  if (
+    window.SCORVEX_INVENTORY &&
+    typeof window.SCORVEX_INVENTORY.render ===
+    "function"
+  ) {
+
+    window.SCORVEX_INVENTORY.render(
+      saveData
+    );
+  }
+}
+
+
+/* ============================================================
+   PERSONALIZACIÓN
+============================================================ */
+
+function openCustomize() {
+
+  showScreen(
+    "customizeScreen"
+  );
+
+  if (
+    window.SCORVEX_CHARACTERS &&
+    typeof window.SCORVEX_CHARACTERS.render ===
+    "function"
+  ) {
+
+    window.SCORVEX_CHARACTERS.render(
+      saveData
+    );
+  }
+}
+
+
+/* ============================================================
+   EVENTOS
+============================================================ */
+
+function setupButtons() {
+
+  $("btnPlay")?.addEventListener(
+    "click",
+    startGame
+  );
+
+  $("btnShop")?.addEventListener(
+    "click",
+    openShop
+  );
+
+  $("btnInventory")?.addEventListener(
+    "click",
+    openInventory
+  );
+
+  $("btnCustomize")?.addEventListener(
+    "click",
+    openCustomize
+  );
+
+
+  $("btnBackShop")?.addEventListener(
+    "click",
+    () => {
+      showScreen(
+        "mainMenu"
+      );
+
+      updateAllUI();
+    }
+  );
+
+
+  $("btnBackInventory")?.addEventListener(
+    "click",
+    () => {
+      showScreen(
+        "mainMenu"
+      );
+
+      updateAllUI();
+    }
+  );
+
+
+  $("btnBackCustomize")?.addEventListener(
+    "click",
+    () => {
+      showScreen(
+        "mainMenu"
+      );
+
+      updateAllUI();
+    }
+  );
+
+
+  $("btnPause")?.addEventListener(
+    "click",
+    togglePause
+  );
+
+
+  $("btnResume")?.addEventListener(
+    "click",
+    resumeGame
+  );
+
+
+  $("btnPauseRestart")?.addEventListener(
+    "click",
+    () => {
+
+      resumeGame();
+
+      startGame();
+    }
+  );
+
+
+  $("btnPauseExit")?.addEventListener(
+    "click",
+    showMainMenu
+  );
+
+
+  $("btnLeaveGame")?.addEventListener(
+    "click",
+    () => {
+
+      paused = true;
+
+      openModal({
+        icon: "⚠",
+        title: "SALIR DE LA ARENA",
+        content:
+          "¿Quieres volver al menú principal?",
+
+        actions: [
+          {
+            text: "SALIR",
+            className:
+              "btn btn-danger",
+
+            callback() {
+              closeModal();
+              showMainMenu();
+            }
+          },
+
+          {
+            text: "CANCELAR",
+            className:
+              "btn btn-secondary",
+
+            callback() {
+              closeModal();
+              paused = false;
+              lastFrame =
+                performance.now();
+            }
+          }
+        ]
+      });
+    }
+  );
+
+
+  $("btnUseMedkit")?.addEventListener(
+    "click",
+    useMedkit
+  );
+
+  $("btnUseEnergy")?.addEventListener(
+    "click",
+    useEnergyKit
+  );
+
+  $("btnUseShield")?.addEventListener(
+    "click",
+    useShieldKit
+  );
+
+
+  $("modalClose")?.addEventListener(
+    "click",
+    closeModal
+  );
+
+
+  $("btnMusic")?.addEventListener(
+    "click",
+    toggleMusic
+  );
+
+
+  $("btnSound")?.addEventListener(
+    "click",
+    toggleSound
+  );
+
+
+  document
+    .querySelectorAll(
+      ".music-btn"
+    )
+    .forEach(
+      (button) => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            selectMusicTrack(
+              button.dataset.track
+            );
+          }
+        );
+      }
+    );
+}
+
+
+/* ============================================================
+   FILTROS DE TIENDA
+============================================================ */
+
+function setupShopFilters() {
+
+  document
+    .querySelectorAll(
+      ".shop-filter"
+    )
+    .forEach(
+      (button) => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            document
+              .querySelectorAll(
+                ".shop-filter"
+              )
+              .forEach(
+                (item) => {
+                  item.classList.remove(
+                    "active"
+                  );
+                }
+              );
+
+            button.classList.add(
+              "active"
+            );
+
+            if (
+              window.SCORVEX_SHOP &&
+              typeof window.SCORVEX_SHOP.setFilter ===
+              "function"
+            ) {
+
+              window.SCORVEX_SHOP.setFilter(
+                button.dataset.filter,
+                saveData
+              );
+            }
+          }
+        );
+      }
+    );
+}
+
+
+/* ============================================================
+   TABS DE INVENTARIO
+============================================================ */
+
+function setupInventoryTabs() {
+
+  document
+    .querySelectorAll(
+      ".inventory-tab"
+    )
+    .forEach(
+      (button) => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            document
+              .querySelectorAll(
+                ".inventory-tab"
+              )
+              .forEach(
+                (tab) => {
+                  tab.classList.remove(
+                    "active"
+                  );
+                }
+              );
+
+            button.classList.add(
+              "active"
+            );
+
+            if (
+              window.SCORVEX_INVENTORY &&
+              typeof window.SCORVEX_INVENTORY.setTab ===
+              "function"
+            ) {
+
+              window.SCORVEX_INVENTORY.setTab(
+                button.dataset.inventoryTab,
+                saveData
+              );
+            }
+          }
+        );
+      }
+    );
+}
+
+
+/* ============================================================
+   TABS DE PERSONAJE
+============================================================ */
+
+function setupCustomizeTabs() {
+
+  document
+    .querySelectorAll(
+      ".customize-tab"
+    )
+    .forEach(
+      (button) => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            document
+              .querySelectorAll(
+                ".customize-tab"
+              )
+              .forEach(
+                (tab) => {
+
+                  tab.classList.remove(
+                    "active"
+                  );
+                }
+              );
+
+            button.classList.add(
+              "active"
+            );
+
+            if (
+              window.SCORVEX_CHARACTERS &&
+              typeof window.SCORVEX_CHARACTERS.setTab ===
+              "function"
+            ) {
+
+              window.SCORVEX_CHARACTERS.setTab(
+                button.dataset.customTab,
+                saveData
+              );
+            }
+          }
+        );
+      }
+    );
+}
+
+
+/* ============================================================
+   RESIZE
+============================================================ */
+
+function resizeCanvas() {
+
+  if (!elements.canvas) {
+    return;
+  }
+
+  elements.canvas.width =
+    CANVAS_WIDTH;
+
+  elements.canvas.height =
+    CANVAS_HEIGHT;
+}
+
+
+/* ============================================================
+   API PARA LOS OTROS ARCHIVOS
+============================================================ */
+
+window.SCORVEX_GAME = {
+
+  initialized: false,
+
+
+  initialize() {
+
+    if (
+      this.initialized
+    ) {
+      return;
+    }
+
+    this.initialized = true;
+
+    console.log(
+      `%cSCORVEX ${SCORVEX_VERSION}`,
+      "color:#00e5ff;font-size:20px;font-weight:bold;"
+    );
+
+    console.log(
+      "[SCORVEX] Inicializando sistemas..."
+    );
+
+    loadGame();
+
+    resizeCanvas();
+
+    setupButtons();
+
+    setupShopFilters();
+
+    setupInventoryTabs();
+
+    setupCustomizeTabs();
+
+    setupMobileControls();
+
+    selectMusicTrack(
+      saveData.selectedTrack
+    );
+
+    updateMusicButtons();
+
+    updateAllUI();
+
+    showScreen(
+      "mainMenu"
+    );
+
+    callAudio(
+      "initialize",
+      {
+        musicEnabled:
+          saveData.musicEnabled,
+
+        soundEnabled:
+          saveData.soundEnabled,
+
+        track:
+          saveData.selectedTrack
+      }
+    );
+
+    if (
+      saveData.musicEnabled
+    ) {
+      callAudio(
+        "playMenuMusic"
+      );
+    }
+
+    console.log(
+      "[SCORVEX] Sistema listo."
+    );
+  },
+
+
+  getSave() {
+    return saveData;
+  },
+
+
+  save() {
+    saveGame();
+  },
+
+
+  updateUI() {
+    updateAllUI();
+  },
+
+
+  notify(
+    message,
+    type
+  ) {
+    notify(
+      message,
+      type
+    );
+  },
+
+
+  equipWeapon(
+    weaponId
+  ) {
+
+    const weapons =
+      getWeaponsDatabase();
+
+    if (
+      !weapons[weaponId]
+    ) {
+      return false;
+    }
+
+    if (
+      !saveData.ownedWeapons.includes(
+        weaponId
+      )
+    ) {
+      return false;
+    }
+
+    saveData.weapon =
+      weaponId;
+
+    const weapon =
+      getWeapon();
+
+    player.ammo =
+      weapon.magazine;
+
+    saveGame();
+
+    updateAllUI();
+
+    notify(
+      `${weapon.name} equipado`,
+      "success"
+    );
+
+    return true;
+  },
+
+
+  equipAbility(
+    abilityId
+  ) {
+
+    const abilities =
+      getAbilitiesDatabase();
+
+    if (
+      !abilities[abilityId]
+    ) {
+      return false;
+    }
+
+    if (
+      !saveData.ownedAbilities.includes(
+        abilityId
+      )
+    ) {
+      return false;
+    }
+
+    saveData.ability =
+      abilityId;
+
+    saveGame();
+
+    updateAllUI();
+
+    notify(
+      `${abilities[abilityId].name} equipada`,
+      "success"
+    );
+
+    return true;
+  },
+
+
+  equipArmor(
+    armorId
+  ) {
+
+    if (
+      !ARMORS[armorId]
+    ) {
+      return false;
+    }
+
+    if (
+      !saveData.ownedArmors.includes(
+        armorId
+      )
+    ) {
+      return false;
+    }
+
+    saveData.armor =
+      armorId;
+
+    saveGame();
+
+    updateAllUI();
+
+    return true;
+  },
+
+
+  spendCoins(
+    amount
+  ) {
+
+    const price =
+      Math.max(
+        0,
+        Number(amount) || 0
+      );
+
+    if (
+      saveData.coins <
+      price
+    ) {
+      return false;
+    }
+
+    saveData.coins -=
+      price;
+
+    saveGame();
+
+    updateAllUI();
+
+    return true;
+  },
+
+
+  addCoins(
+    amount
+  ) {
+
+    saveData.coins +=
+      Math.max(
+        0,
+        Number(amount) || 0
+      );
+
+    saveGame();
+
+    updateAllUI();
+  },
+
+
+  addCrystals(
+    amount
+  ) {
+
+    saveData.crystals +=
+      Math.max(
+        0,
+        Number(amount) || 0
+      );
+
+    saveGame();
+
+    updateAllUI();
+  },
+
+
+  ownWeapon(
+    weaponId
+  ) {
+
+    if (
+      !saveData.ownedWeapons.includes(
+        weaponId
+      )
+    ) {
+
+      saveData.ownedWeapons.push(
+        weaponId
+      );
+
+      saveGame();
+    }
+  },
+
+
+  ownAbility(
+    abilityId
+  ) {
+
+    if (
+      !saveData.ownedAbilities.includes(
+        abilityId
+      )
+    ) {
+
+      saveData.ownedAbilities.push(
+        abilityId
+      );
+
+      saveGame();
+    }
+  },
+
+
+  ownArmor(
+    armorId
+  ) {
+
+    if (
+      !saveData.ownedArmors.includes(
+        armorId
+      )
+    ) {
+
+      saveData.ownedArmors.push(
+        armorId
+      );
+
+      saveGame();
+    }
+  },
+
+
+  useMedkit,
+
+  useEnergyKit,
+
+  useShieldKit,
+
+  resetSave,
+
+  startGame,
+
+  showMainMenu
+};
+
+
+/* ============================================================
+   AUTO INICIO DE SEGURIDAD
+
+   index.html también llama initialize().
+   La comprobación "initialized" evita duplicarlo.
+============================================================ */
+
+window.addEventListener(
+  "load",
+  () => {
+
+    setTimeout(
+      () => {
+
+        if (
+          window.SCORVEX_GAME &&
+          !window.SCORVEX_GAME.initialized
+        ) {
+
+          window.SCORVEX_GAME.initialize();
+        }
+
+      },
+      1800
+    );
+  }
+);
+
+
+/* ============================================================
+   FIN DE SCORVEX G7 GAME.JS
+============================================================ */
